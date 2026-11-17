@@ -1,0 +1,3830 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Cotizador Actuarial — Seguros de Vida y Anualidades Contingentes (CNSF 2000-I | 5%)</title>
+  <style>
+    /* ================================================================== */
+    /* TOKENS DE DISEÑO                                                   */
+    /* ================================================================== */
+    :root {
+      --bg: #f5f5f7;
+      --surface: #ffffff;
+      --surface-2: #fbfbfd;
+      --fill: rgba(118, 118, 128, 0.10);
+      --fill-strong: rgba(118, 118, 128, 0.18);
+      --field: #ffffff;
+      --hairline: rgba(0, 0, 0, 0.10);
+      --hairline-strong: rgba(0, 0, 0, 0.18);
+      --text: #1d1d1f;
+      --text-2: #515154;
+      --text-3: #6e6e73;
+      --accent: #0071e3;
+      --accent-press: #0062c4;
+      --accent-tint: rgba(0, 113, 227, 0.08);
+      --accent-ring: rgba(0, 113, 227, 0.28);
+      --success: #1d7a36;
+      --success-tint: rgba(52, 199, 89, 0.14);
+      --warn: #8a5a00;
+      --warn-tint: rgba(255, 159, 10, 0.16);
+      --danger: #d70015;
+      --danger-tint: rgba(255, 59, 48, 0.09);
+      --ink: #1d1d1f;
+      --ink-text: #f5f5f7;
+      --ink-text-2: #a1a1a6;
+      --nav-bg: rgba(245, 245, 247, 0.72);
+      --scrim: rgba(0, 0, 0, 0.38);
+      --pill: #ffffff;
+
+      --r-xl: 24px;
+      --r-lg: 18px;
+      --r-md: 12px;
+      --r-sm: 8px;
+
+      --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 28px rgba(0, 0, 0, 0.05);
+      --shadow-pill: 0 1px 2px rgba(0, 0, 0, 0.10), 0 2px 8px rgba(0, 0, 0, 0.06);
+      --shadow-modal: 0 24px 80px rgba(0, 0, 0, 0.30);
+
+      --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+      --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+      --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+      --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', Roboto, Arial, sans-serif;
+      --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #000000;
+        --surface: #1c1c1e;
+        --surface-2: #232326;
+        --fill: rgba(118, 118, 128, 0.22);
+        --fill-strong: rgba(118, 118, 128, 0.34);
+        --field: #2c2c2e;
+        --hairline: rgba(255, 255, 255, 0.12);
+        --hairline-strong: rgba(255, 255, 255, 0.22);
+        --text: #f5f5f7;
+        --text-2: #c7c7cc;
+        --text-3: #98989d;
+        --accent: #0a84ff;
+        --accent-press: #3a9bff;
+        --accent-tint: rgba(10, 132, 255, 0.16);
+        --accent-ring: rgba(10, 132, 255, 0.40);
+        --success: #30d158;
+        --success-tint: rgba(48, 209, 88, 0.16);
+        --warn: #ffd60a;
+        --warn-tint: rgba(255, 214, 10, 0.14);
+        --danger: #ff6961;
+        --danger-tint: rgba(255, 69, 58, 0.14);
+        --ink: #2c2c2e;
+        --nav-bg: rgba(0, 0, 0, 0.66);
+        --scrim: rgba(0, 0, 0, 0.6);
+        --pill: #636366;
+        --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.06);
+        --shadow-pill: 0 1px 2px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { -webkit-text-size-adjust: 100%; }
+
+    body {
+      font-family: var(--font-sans);
+      font-size: 1rem;
+      line-height: 1.47;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 4rem;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    body.modal-open { overflow: hidden; }
+
+    .hidden { display: none !important; }
+
+    .visually-hidden {
+      position: absolute; width: 1px; height: 1px; overflow: hidden;
+      clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+
+    :focus-visible { outline: 3px solid var(--accent-ring); outline-offset: 2px; }
+    h2:focus { outline: none; }
+
+    svg.ico { width: 1em; height: 1em; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ================================================================== */
+    /* BARRA SUPERIOR TRANSLÚCIDA                                         */
+    /* ================================================================== */
+    .top-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--nav-bg);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid transparent;
+      transition: border-color 200ms ease;
+    }
+
+    .top-header.is-scrolled { border-bottom-color: var(--hairline); }
+
+    .header-container {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 0 1.25rem;
+      height: 52px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .brand-block { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
+
+    .brand-icon {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: var(--ink);
+      color: #ffffff;
+      display: grid; place-items: center;
+      font-family: var(--font-mono);
+      font-size: 1rem; font-weight: 600;
+      line-height: 1;
+      padding-bottom: 2px;
+      flex-shrink: 0;
+    }
+
+    .brand-name { font-size: 0.94rem; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; }
+
+    .header-badges { display: flex; align-items: center; gap: 0.5rem; }
+
+    .tech-badge {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-3);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .tech-badge + .tech-badge::before { content: "·"; margin-right: 0.5rem; }
+
+    .btn-table-viewer {
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--accent);
+      background: var(--accent-tint);
+      border: none;
+      padding: 0.4rem 0.8rem;
+      border-radius: 999px;
+      cursor: pointer;
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      white-space: nowrap;
+      margin-left: 0.35rem;
+      transition: transform 140ms var(--ease-out), background-color 160ms ease;
+    }
+
+    .btn-table-viewer:active { transform: scale(0.96); }
+
+    /* ================================================================== */
+    /* ENCABEZADO DE PÁGINA                                               */
+    /* ================================================================== */
+    .main-wrapper { max-width: 920px; margin: 0 auto; padding: 0 1.25rem; }
+
+    .page-hero { padding: 2.5rem 0 1.75rem; }
+
+    .eyebrow {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.01em;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-hero h1 {
+      font-size: clamp(1.75rem, 4.6vw, 2.75rem);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -0.025em;
+      text-wrap: balance;
+      max-width: 20ch;
+    }
+
+    .page-hero p {
+      margin-top: 0.75rem;
+      font-size: 1.06rem;
+      color: var(--text-2);
+      max-width: 52ch;
+      text-wrap: pretty;
+    }
+
+    /* ================================================================== */
+    /* STEPPER (CONTROL SEGMENTADO CON INDICADOR DESLIZANTE)              */
+    /* ================================================================== */
+    .stepper {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 4px;
+      border-radius: 16px;
+      background: var(--fill);
+      margin-bottom: 1.25rem;
+      --step-index: 0;
+    }
+
+    .stepper[data-step="2"] { --step-index: 1; }
+    .stepper[data-step="3"] { --step-index: 2; }
+
+    .stepper::before {
+      content: "";
+      position: absolute;
+      top: 4px; bottom: 4px; left: 4px;
+      width: calc((100% - 8px) / 3);
+      border-radius: 12px;
+      background: var(--pill);
+      box-shadow: var(--shadow-pill);
+      transform: translateX(calc(var(--step-index) * 100%));
+      transition: transform 480ms var(--ease-drawer);
+    }
+
+    .step-item {
+      position: relative;
+      font: inherit;
+      color: inherit;
+      text-align: left;
+      background: none;
+      border: none;
+      border-radius: 12px;
+      padding: 0.6rem 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      min-height: 52px;
+      min-width: 0;
+      overflow: hidden;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .step-item:disabled { cursor: default; }
+    .step-item.active { cursor: default; }
+
+    .step-circle {
+      position: relative;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: var(--fill-strong);
+      color: var(--text-3);
+      font-weight: 600;
+      font-size: 0.8rem;
+      font-variant-numeric: tabular-nums;
+      display: grid; place-items: center;
+      flex-shrink: 0;
+      transition: background-color 250ms ease, color 250ms ease;
+    }
+
+    .step-item.active .step-circle { background: var(--accent); color: #ffffff; }
+
+    .step-item.completed .step-circle { background: var(--success-tint); color: transparent; }
+
+    .step-item.completed .step-circle::after {
+      content: "";
+      position: absolute;
+      left: 50%; top: 46%;
+      width: 6px; height: 11px;
+      border: solid var(--success);
+      border-width: 0 2px 2px 0;
+      transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    .step-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+
+    .step-label { font-size: 0.7rem; font-weight: 500; color: var(--text-3); }
+
+    .step-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-3);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      transition: color 250ms ease;
+    }
+
+    .step-item.active .step-title,
+    .step-item.completed .step-title { color: var(--text); }
+
+    @media (hover: hover) and (pointer: fine) {
+      .step-item.completed:hover .step-title { color: var(--accent); }
+    }
+
+    /* ================================================================== */
+    /* TARJETAS / PASOS                                                   */
+    /* ================================================================== */
+    .card {
+      background: var(--surface);
+      border-radius: var(--r-xl);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+      animation: stepIn 460ms var(--ease-out) backwards;
+    }
+
+    :root[data-dir="back"] .card { animation-name: stepInBack; }
+
+    @keyframes stepIn { from { opacity: 0; transform: translateX(28px); } }
+    @keyframes stepInBack { from { opacity: 0; transform: translateX(-28px); } }
+    @keyframes fade { from { opacity: 0; } }
+    @keyframes riseIn { from { opacity: 0; transform: translateY(14px); } }
+    @keyframes fieldIn { from { opacity: 0; transform: translateY(-6px); } }
+
+    .card-header {
+      padding: 1.75rem 2rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 0.75rem 1rem;
+    }
+
+    .card-header .step-eyebrow {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-3);
+      margin-bottom: 0.2rem;
+    }
+
+    .card-header h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    .card-header p { font-size: 0.95rem; color: var(--text-2); margin-top: 0.35rem; max-width: 56ch; text-wrap: pretty; }
+
+    .card-body { padding: 1.5rem 2rem 2rem; }
+
+    /* ================================================================== */
+    /* FORMULARIOS                                                        */
+    /* ================================================================== */
+    .form-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.5rem 1.25rem; }
+
+    .col-12 { grid-column: span 12; }
+    .col-8 { grid-column: span 8; }
+    .col-6 { grid-column: span 6; }
+    .col-4 { grid-column: span 4; }
+
+    .form-group { display: flex; flex-direction: column; gap: 0.45rem; min-width: 0; }
+
+    .form-grid > .form-group { animation: fieldIn 280ms var(--ease-out) backwards; }
+
+    .form-label {
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .form-hint { font-size: 0.8rem; font-weight: 400; color: var(--text-3); text-wrap: pretty; }
+
+    .input-control, .select-control {
+      width: 100%;
+      min-height: 46px;
+      padding: 0.65rem 0.9rem;
+      border: 1px solid var(--hairline-strong);
+      border-radius: var(--r-md);
+      font: inherit;
+      font-size: 1rem;
+      color: var(--text);
+      background-color: var(--field);
+      transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+    }
+
+    .input-control[type="number"] { font-variant-numeric: tabular-nums; }
+
+    .input-control::placeholder { color: var(--text-3); opacity: 0.7; }
+
+    .select-control {
+      -webkit-appearance: none;
+      appearance: none;
+      padding-right: 2.4rem;
+      text-overflow: ellipsis;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%2386868b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.95rem center;
+      background-size: 11px;
+      cursor: pointer;
+    }
+
+    .input-control:focus, .select-control:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px var(--accent-ring);
+    }
+
+    .input-control.input-error {
+      border-color: var(--danger);
+      background-color: var(--danger-tint);
+    }
+
+    .input-control.input-error:focus { box-shadow: 0 0 0 4px var(--danger-tint); }
+
+    /* Campo numérico con botones − / + */
+    .num-stepper { display: flex; gap: 0.4rem; }
+    .num-stepper .input-control { text-align: center; -moz-appearance: textfield; appearance: textfield; }
+    .num-stepper .input-control::-webkit-outer-spin-button,
+    .num-stepper .input-control::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+    .num-btn {
+      flex: 0 0 46px;
+      height: 46px;
+      border: none;
+      border-radius: var(--r-md);
+      background: var(--fill);
+      color: var(--text);
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: grid; place-items: center;
+      transition: transform 120ms var(--ease-out), background-color 160ms ease;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    .num-btn:active { transform: scale(0.94); background: var(--fill-strong); }
+
+    /* Eco con formato de moneda bajo los montos */
+    .amount-echo {
+      font-size: 0.82rem;
+      color: var(--text-3);
+      font-variant-numeric: tabular-nums;
+      min-height: 1.2em;
+    }
+
+    .amount-echo strong { color: var(--text); font-weight: 600; }
+
+    /* ================================================================== */
+    /* TARJETAS DE OPCIÓN (RADIO)                                         */
+    /* ================================================================== */
+    .choice-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.65rem; }
+
+    .choice-card {
+      position: relative;
+      border: 1px solid var(--hairline-strong);
+      border-radius: 14px;
+      padding: 0.85rem 2.6rem 0.85rem 1rem;
+      cursor: pointer;
+      background: var(--field);
+      display: flex;
+      align-items: flex-start;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease, transform 140ms var(--ease-out);
+    }
+
+    .choice-card:active { transform: scale(0.985); }
+
+    .choice-card input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 1px; height: 1px;
+      pointer-events: none;
+    }
+
+    /* Marca de selección */
+    .choice-card::after {
+      content: "";
+      position: absolute;
+      top: 0.85rem; right: 0.9rem;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      border: 1.5px solid var(--hairline-strong);
+      background: transparent center / 12px no-repeat;
+      transition: background-color 180ms ease, border-color 180ms ease, transform 220ms var(--ease-out);
+    }
+
+    .choice-card.selected {
+      border-color: var(--accent);
+      background: var(--accent-tint);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+
+    .choice-card.selected::after {
+      border-color: var(--accent);
+      background-color: var(--accent);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 6.4l2.4 2.4 4.6-5.2'/%3E%3C/svg%3E");
+      transform: scale(1.05);
+    }
+
+    .choice-card:has(input:focus-visible) { outline: 3px solid var(--accent-ring); outline-offset: 2px; }
+
+    @media (hover: hover) and (pointer: fine) {
+      .choice-card:not(.selected):hover { border-color: var(--text-3); }
+      .btn-table-viewer:hover { background: var(--accent-ring); }
+      .num-btn:hover { background: var(--fill-strong); }
+    }
+
+    .choice-content { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+
+    .choice-title { font-weight: 600; font-size: 0.95rem; color: var(--text); letter-spacing: -0.005em; }
+
+    .choice-desc { font-size: 0.8rem; color: var(--text-2); text-wrap: pretty; }
+
+    .choice-badge {
+      display: inline-block;
+      margin-top: 0.4rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      background: var(--fill);
+      color: var(--text-2);
+      width: fit-content;
+      font-variant-numeric: tabular-nums;
+      transition: background-color 180ms ease, color 180ms ease;
+    }
+
+    .choice-card.selected .choice-badge { background: var(--accent); color: #ffffff; }
+
+    .product-card { padding: 1.15rem 2.8rem 1.15rem 1.2rem; }
+    .product-card .choice-title { font-size: 1.1rem; letter-spacing: -0.015em; }
+    .product-card .choice-desc { font-size: 0.86rem; }
+
+    /* ================================================================== */
+    /* PANEL EN VIVO: EDAD ACTUARIAL                                      */
+    /* ================================================================== */
+    .actuarial-age-box {
+      background: var(--fill);
+      border-radius: var(--r-lg);
+      padding: 1.1rem 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem 1.5rem;
+    }
+
+    .box-kicker {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-3);
+      margin-bottom: 0.5rem;
+    }
+
+    .age-formula-steps {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.86rem;
+      color: var(--text-3);
+    }
+
+    .age-pill {
+      background: var(--surface);
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      font-weight: 500;
+      color: var(--text);
+      font-size: 0.8rem;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .age-pill.discount { background: var(--success-tint); color: var(--success); }
+    .age-pill.truncated { background: var(--warn-tint); color: var(--warn); }
+
+    .age-result-highlight {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      line-height: 1.15;
+      margin-left: auto;
+    }
+
+    .age-result-highlight > span:first-child { font-size: 0.75rem; font-weight: 600; color: var(--text-3); }
+
+    .age-result-highlight span.big-x {
+      font-family: var(--font-mono);
+      font-size: 1.6rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    /* ================================================================== */
+    /* ALERTAS                                                            */
+    /* ================================================================== */
+    .alert-box {
+      padding: 0.85rem 1rem;
+      border-radius: var(--r-md);
+      font-size: 0.9rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+      line-height: 1.45;
+      animation: fieldIn 260ms var(--ease-out) backwards;
+    }
+
+    .alert-error { background: var(--danger-tint); color: var(--danger); }
+    .alert-error strong { font-weight: 700; }
+
+    .alert-icon {
+      flex: 0 0 20px;
+      height: 20px;
+      margin-top: 1px;
+      border-radius: 50%;
+      background: var(--danger);
+      color: #ffffff;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: grid; place-items: center;
+    }
+
+    /* ================================================================== */
+    /* MONTOS RÁPIDOS                                                     */
+    /* ================================================================== */
+    .quick-amounts { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.15rem; }
+
+    .btn-chip {
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      background: var(--fill);
+      border: none;
+      color: var(--text);
+      padding: 0.4rem 0.8rem;
+      min-height: 34px;
+      border-radius: 999px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      transition: transform 120ms var(--ease-out), background-color 160ms ease, color 160ms ease;
+    }
+
+    .btn-chip:active { transform: scale(0.95); }
+    .btn-chip.is-active { background: var(--accent); color: #ffffff; }
+
+    @media (hover: hover) and (pointer: fine) {
+      .btn-chip:not(.is-active):hover { background: var(--fill-strong); }
+    }
+
+    /* ================================================================== */
+    /* RESUMEN DEL ASEGURADO (PASO 2)                                     */
+    /* ================================================================== */
+    .insured-summary-banner {
+      background: var(--fill);
+      border-radius: var(--r-lg);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .banner-items {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.9rem 1.25rem;
+    }
+
+    .banner-item { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+
+    .banner-item .lbl { font-size: 0.72rem; font-weight: 500; color: var(--text-3); }
+
+    .banner-item .val { font-size: 0.92rem; font-weight: 600; color: var(--text); overflow-wrap: anywhere; }
+
+    .banner-item .val.accent { color: var(--accent); font-variant-numeric: tabular-nums; }
+
+    /* ================================================================== */
+    /* VISTA PREVIA DE FÓRMULA                                            */
+    /* ================================================================== */
+    .formula-preview-card {
+      background: var(--fill);
+      border-radius: var(--r-lg);
+      padding: 1rem 1.25rem 1.15rem;
+      margin-top: 1.5rem;
+    }
+
+    .formula-preview-header {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-3);
+      margin-bottom: 0.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.25rem 1rem;
+    }
+
+    #etiquetaEdadesPreview { color: var(--accent); font-family: var(--font-mono); font-weight: 500; }
+
+    .formula-expression {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text);
+      overflow-x: auto;
+      white-space: nowrap;
+      padding-bottom: 2px;
+    }
+
+    /* ================================================================== */
+    /* BOTONES                                                            */
+    /* ================================================================== */
+    .card-actions {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .actions-group { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+
+    .btn {
+      font: inherit;
+      font-size: 0.98rem;
+      font-weight: 500;
+      min-height: 46px;
+      padding: 0.65rem 1.35rem;
+      border-radius: 999px;
+      cursor: pointer;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      transition: transform 140ms var(--ease-out), background-color 160ms ease, color 160ms ease;
+    }
+
+    .btn:active { transform: scale(0.97); }
+
+    .btn-primary, .btn-emerald { background: var(--accent); color: #ffffff; }
+    .btn-secondary { background: var(--fill); color: var(--text); }
+    .btn-danger-outline { background: transparent; color: var(--danger); }
+    .btn-sm { min-height: 36px; padding: 0.4rem 0.95rem; font-size: 0.86rem; }
+
+    @media (hover: hover) and (pointer: fine) {
+      .btn-primary:hover, .btn-emerald:hover { background: var(--accent-press); }
+      .btn-secondary:hover { background: var(--fill-strong); }
+      .btn-danger-outline:hover { background: var(--danger-tint); }
+    }
+
+    /* ================================================================== */
+    /* COMPROBANTE (PASO 3)                                               */
+    /* ================================================================== */
+    .certificate-banner {
+      padding: 1.75rem 2rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.5rem;
+    }
+
+    .cert-title-group { min-width: 0; flex: 1 1 320px; }
+
+    .cert-title-group h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      text-wrap: balance;
+    }
+
+    .cert-title-group p { font-size: 0.86rem; color: var(--text-3); margin-top: 0.4rem; }
+
+    .cert-meta {
+      text-align: right;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: var(--text-3);
+      line-height: 1.5;
+    }
+
+    .cert-meta .folio { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+
+    [data-reveal] {
+      animation: riseIn 560ms var(--ease-out) backwards;
+      animation-delay: calc(var(--i, 0) * 70ms + 140ms);
+    }
+
+    .financial-highlight {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .fin-metric {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      background: var(--fill);
+      border-radius: var(--r-lg);
+      padding: 1.1rem 1.25rem;
+      min-width: 0;
+    }
+
+    .fin-metric .fin-label { font-size: 0.78rem; font-weight: 600; color: var(--text-3); }
+
+    .fin-metric .fin-value {
+      font-size: 1.3rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+      overflow-wrap: anywhere;
+    }
+
+    .fin-sub { font-size: 0.8rem; color: var(--text-3); text-wrap: pretty; overflow-wrap: anywhere; }
+
+    .fin-metric.primary-result {
+      grid-column: 1 / -1;
+      background: var(--ink);
+      color: var(--ink-text);
+      padding: 1.6rem 1.75rem 1.5rem;
+      border-radius: var(--r-xl);
+    }
+
+    .fin-metric.primary-result .fin-label { color: var(--ink-text-2); font-size: 0.86rem; }
+
+    .fin-metric.primary-result .fin-value {
+      color: #ffffff;
+      font-size: clamp(2rem, 6.4vw, 3.25rem);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.035em;
+      margin: 0.15rem 0 0.3rem;
+    }
+
+    .fin-metric.primary-result .fin-sub { color: var(--ink-text-2); font-variant-numeric: tabular-nums; }
+
+    .result-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 0.75rem; }
+
+    .info-panel { background: var(--fill); border-radius: var(--r-lg); padding: 1.15rem 1.25rem; min-width: 0; }
+
+    .info-panel-title { font-size: 0.78rem; font-weight: 600; color: var(--text-3); margin-bottom: 0.6rem; }
+
+    .kv-list { display: flex; flex-direction: column; }
+
+    .kv-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 0.88rem;
+      gap: 1rem;
+      padding: 0.5rem 0;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .kv-row:first-child { border-top: none; padding-top: 0; }
+    .kv-row:last-child { padding-bottom: 0; }
+
+    .kv-row .k { color: var(--text-2); flex-shrink: 0; max-width: 46%; }
+    .kv-row .v { color: var(--text); font-weight: 600; text-align: right; overflow-wrap: anywhere; }
+    .kv-row .v.mono { font-family: var(--font-mono); color: var(--accent); }
+
+    /* Memoria de cálculo */
+    details.calc-memory { background: var(--fill); border-radius: var(--r-lg); overflow: hidden; }
+
+    details.calc-memory summary {
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      user-select: none;
+      list-style: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    details.calc-memory summary::-webkit-details-marker { display: none; }
+
+    .summary-chevron {
+      flex: 0 0 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--fill-strong);
+      display: grid; place-items: center;
+      color: var(--text-2);
+      font-size: 0.8rem;
+      transition: transform 320ms var(--ease-out);
+    }
+
+    details[open] .summary-chevron { transform: rotate(180deg); }
+
+    @supports (interpolate-size: allow-keywords) {
+      details.calc-memory { interpolate-size: allow-keywords; }
+      details.calc-memory::details-content {
+        height: 0;
+        overflow: clip;
+        transition: height 380ms var(--ease-drawer), content-visibility 380ms allow-discrete;
+      }
+      details.calc-memory[open]::details-content { height: auto; }
+    }
+
+    .memory-content { padding: 0 1.25rem 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; }
+
+    .step-by-step-box {
+      background: #1d1d1f;
+      color: #d2d2d7;
+      padding: 1.1rem 1.25rem;
+      border-radius: var(--r-md);
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .step-by-step-box .hl-cyan { color: #64d2ff; font-weight: 600; }
+    .step-by-step-box .hl-green { color: #30d158; font-weight: 600; }
+    .step-by-step-box .hl-amber { color: #ffd60a; font-weight: 600; }
+
+    .table-caption { font-size: 0.82rem; font-weight: 600; color: var(--text-2); margin-bottom: 0.6rem; }
+
+    /* ================================================================== */
+    /* TABLAS DE CONMUTADOS                                               */
+    /* ================================================================== */
+    .table-responsive {
+      width: 100%;
+      overflow: auto;
+      border-radius: var(--r-md);
+      background: var(--surface);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table.comm-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+
+    table.comm-table th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: var(--surface-2);
+      color: var(--text-2);
+      padding: 0.6rem 0.8rem;
+      font-weight: 600;
+      white-space: nowrap;
+      box-shadow: inset 0 -1px 0 var(--hairline);
+    }
+
+    table.comm-table th:first-child,
+    table.comm-table td:first-child { text-align: center; font-weight: 600; }
+
+    table.comm-table td {
+      padding: 0.5rem 0.8rem;
+      border-bottom: 1px solid var(--hairline);
+      white-space: nowrap;
+      color: var(--text);
+    }
+
+    table.comm-table tbody tr:last-child td { border-bottom: none; }
+
+    table.comm-table tr.highlight-row td { background: var(--accent-tint); font-weight: 600; }
+
+    /* ================================================================== */
+    /* MODAL DE TABLA COMPLETA                                            */
+    /* ================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: var(--scrim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 260ms ease;
+    }
+
+    .modal-dialog {
+      background: var(--surface);
+      border-radius: var(--r-xl);
+      max-width: 1060px;
+      width: 100%;
+      max-height: 88vh;
+      max-height: 88dvh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-modal);
+      overflow: hidden;
+      opacity: 0;
+      transform: scale(0.96) translateY(10px);
+      transition: transform 360ms var(--ease-drawer), opacity 220ms ease;
+    }
+
+    .modal-backdrop.is-open { opacity: 1; }
+    .modal-backdrop.is-open .modal-dialog { opacity: 1; transform: none; }
+
+    .modal-header {
+      padding: 1.15rem 1.25rem 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .modal-header h3 { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.015em; line-height: 1.25; }
+    .modal-header p { font-size: 0.82rem; color: var(--text-3); margin-top: 0.2rem; }
+
+    .modal-close {
+      flex: 0 0 32px;
+      height: 32px;
+      border: none;
+      border-radius: 50%;
+      background: var(--fill);
+      color: var(--text-2);
+      cursor: pointer;
+      display: grid; place-items: center;
+      font-size: 0.95rem;
+      transition: transform 120ms var(--ease-out), background-color 160ms ease;
+    }
+
+    .modal-close:active { transform: scale(0.92); }
+
+    @media (hover: hover) and (pointer: fine) {
+      .modal-close:hover { background: var(--fill-strong); }
+    }
+
+    .modal-body { overflow: hidden; display: flex; min-height: 0; }
+    .modal-body .table-responsive { border-radius: 0; max-height: none; }
+
+    /* ================================================================== */
+    /* CRISTAL LÍQUIDO: FONDO, MATERIALES Y LIMPIEZA DE TEXTO SECUNDARIO   */
+    /* ================================================================== */
+    :root {
+      --bg: #cfe0f8;
+      --surface: rgba(255, 255, 255, 0.56);
+      --surface-2: #eef4fd;
+      --fill: rgba(255, 255, 255, 0.46);
+      --fill-strong: rgba(255, 255, 255, 0.78);
+      --field: rgba(255, 255, 255, 0.62);
+      --hairline: rgba(20, 50, 110, 0.10);
+      --hairline-strong: rgba(20, 50, 110, 0.16);
+      --text-2: #3a4254;
+      --text-3: #5b6478;
+      --nav-bg: rgba(255, 255, 255, 0.30);
+      --pill: rgba(255, 255, 255, 0.88);
+      --ink: #0a6cf5;
+      --glass-edge: rgba(255, 255, 255, 0.70);
+      --glass-shadow: 0 24px 60px rgba(24, 62, 130, 0.16), 0 2px 6px rgba(24, 62, 130, 0.06);
+      --glass-shine: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+      --modal-surface: rgba(246, 250, 255, 0.86);
+      --wallpaper:
+        radial-gradient(55% 45% at 12% 12%, #ffffff 0%, rgba(255, 255, 255, 0) 70%),
+        radial-gradient(60% 55% at 92% 8%, #8fbcff 0%, rgba(143, 188, 255, 0) 70%),
+        radial-gradient(65% 60% at 85% 95%, #5f9bf5 0%, rgba(95, 155, 245, 0) 70%),
+        radial-gradient(55% 55% at 5% 95%, #a9ccff 0%, rgba(169, 204, 255, 0) 70%),
+        linear-gradient(160deg, #e3eefc 0%, #b9d3f7 100%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #07122b;
+        --surface: rgba(30, 38, 62, 0.55);
+        --surface-2: #1a2238;
+        --fill: rgba(255, 255, 255, 0.08);
+        --fill-strong: rgba(255, 255, 255, 0.18);
+        --field: rgba(255, 255, 255, 0.09);
+        --hairline: rgba(255, 255, 255, 0.10);
+        --hairline-strong: rgba(255, 255, 255, 0.18);
+        --text-2: #cfd6e6;
+        --text-3: #a3adc4;
+        --nav-bg: rgba(10, 18, 40, 0.40);
+        --pill: rgba(255, 255, 255, 0.22);
+        --ink: #0a84ff;
+        --glass-edge: rgba(255, 255, 255, 0.14);
+        --glass-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+        --glass-shine: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+        --modal-surface: rgba(24, 30, 50, 0.88);
+        --wallpaper:
+          radial-gradient(60% 50% at 90% 5%, #1f56c9 0%, rgba(31, 86, 201, 0) 70%),
+          radial-gradient(60% 60% at 5% 95%, #123a8f 0%, rgba(18, 58, 143, 0) 70%),
+          radial-gradient(50% 45% at 15% 10%, #16306b 0%, rgba(22, 48, 107, 0) 70%),
+          linear-gradient(160deg, #0a1733 0%, #050b1c 100%);
+      }
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: var(--wallpaper);
+    }
+
+    .top-header {
+      -webkit-backdrop-filter: saturate(180%) blur(24px);
+      backdrop-filter: saturate(180%) blur(24px);
+    }
+
+    .card, .stepper {
+      border: 1px solid var(--glass-edge);
+      -webkit-backdrop-filter: saturate(170%) blur(30px);
+      backdrop-filter: saturate(170%) blur(30px);
+    }
+
+    .card { box-shadow: var(--glass-shadow), var(--glass-shine); }
+    .stepper { box-shadow: var(--glass-shine); }
+
+    .modal-dialog {
+      background: var(--modal-surface);
+      border: 1px solid var(--glass-edge);
+      -webkit-backdrop-filter: saturate(170%) blur(40px);
+      backdrop-filter: saturate(170%) blur(40px);
+    }
+
+    .insured-summary-banner, .actuarial-age-box, .formula-preview-card,
+    .fin-metric, .info-panel, details.calc-memory {
+      box-shadow: var(--glass-shine);
+    }
+
+    .fin-metric.primary-result {
+      background: linear-gradient(135deg, #0a63f0 0%, #3b93ff 100%);
+      box-shadow: 0 14px 34px rgba(10, 99, 240, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    }
+
+    .fin-metric.primary-result .fin-label { color: rgba(255, 255, 255, 0.82); }
+
+    .brand-icon { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35); }
+
+    .btn-primary, .btn-emerald { box-shadow: 0 6px 16px rgba(0, 113, 227, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.30); }
+
+    /* Encabezado compacto */
+    .page-hero { padding: 1.75rem 0 1.25rem; }
+    .page-hero h1 { font-size: clamp(1.4rem, 3.4vw, 2rem); max-width: none; letter-spacing: -0.02em; }
+
+    /* Opciones de una sola línea, con la marca centrada */
+    .choice-card { align-items: center; min-height: 50px; padding: 0.7rem 2.6rem 0.7rem 1rem; }
+    .choice-card::after { top: 50%; transform: translateY(-50%); }
+    .choice-card.selected::after { transform: translateY(-50%); }
+    .product-card { min-height: 60px; padding: 0.9rem 2.8rem 0.9rem 1.2rem; }
+
+    #formPaso1 .card-actions { justify-content: flex-end; }
+    .form-grid { gap: 1.35rem 1.25rem; }
+    .cert-meta { color: var(--text-2); }
+
+    /* En pantalla se oculta el texto secundario; al imprimir el comprobante sale completo */
+    @media screen {
+      .tech-badge, .eyebrow, .page-hero p, .step-label, .step-eyebrow,
+      .card-header p, .form-hint, .choice-desc, .choice-badge, .box-kicker,
+      .cert-title-group p, .fin-sub, .table-caption, .modal-header p {
+        display: none !important;
+      }
+    }
+
+    /* ================================================================== */
+    /* FONDO LÍQUIDO, CRISTAL MÁS TRANSPARENTE Y TRANSICIÓN LÍQUIDA        */
+    /* ================================================================== */
+    :root {
+      --surface: rgba(255, 255, 255, 0.20);
+      --fill: rgba(255, 255, 255, 0.26);
+      --fill-strong: rgba(255, 255, 255, 0.62);
+      --field: rgba(255, 255, 255, 0.44);
+      --nav-bg: rgba(255, 255, 255, 0.14);
+      --pill: rgba(255, 255, 255, 0.72);
+      --glass-edge: rgba(255, 255, 255, 0.78);
+      --glass-shadow: 0 30px 70px rgba(20, 56, 128, 0.20), 0 2px 8px rgba(20, 56, 128, 0.06);
+      --glass-shine: inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(255, 255, 255, 0.25);
+      --gota-1: #7fb0ff; --gota-2: #ffffff; --gota-3: #4a86ee; --gota-4: #a9c9ff; --olas-opacidad: 0.75;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --surface: rgba(22, 30, 54, 0.30);
+        --fill: rgba(255, 255, 255, 0.07);
+        --fill-strong: rgba(255, 255, 255, 0.18);
+        --field: rgba(255, 255, 255, 0.08);
+        --nav-bg: rgba(8, 14, 32, 0.25);
+        --pill: rgba(255, 255, 255, 0.20);
+        --glass-edge: rgba(255, 255, 255, 0.22);
+        --glass-shadow: 0 30px 70px rgba(0, 0, 0, 0.50);
+        --glass-shine: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+        --gota-1: #2a62d8; --gota-2: #17357a; --gota-3: #0f4fd0; --gota-4: #1c2f6e; --olas-opacidad: 0.4;
+      }
+    }
+
+    .fondo-liquido {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .fondo-liquido i {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(64px);
+      opacity: 0.85;
+      will-change: transform;
+    }
+
+    .fondo-liquido i:nth-child(1) { width: 56vmax; height: 56vmax; left: 58%; top: -22%; background: var(--gota-1); }
+    .fondo-liquido i:nth-child(2) { width: 46vmax; height: 46vmax; left: -14%; top: -12%; background: var(--gota-2); }
+    .fondo-liquido i:nth-child(3) { width: 52vmax; height: 52vmax; left: 52%; top: 56%; background: var(--gota-3); }
+    .fondo-liquido i:nth-child(4) { width: 42vmax; height: 42vmax; left: -10%; top: 58%; background: var(--gota-4); }
+
+    /* Ondas de agua: una textura fija que solo se desplaza (no se recalcula en cada cuadro) */
+    .fondo-liquido span {
+      position: absolute;
+      inset: -18%;
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      mix-blend-mode: soft-light;
+      opacity: var(--olas-opacidad);
+      filter: blur(6px);
+      will-change: transform;
+    }
+
+    .fondo-liquido span:nth-of-type(1) {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='600' preserveAspectRatio='none'%3E%3Cfilter id='o' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.004 0.016' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.4 0 0 0 -0.95'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23o)'/%3E%3C/svg%3E");
+    }
+
+    .fondo-liquido span:nth-of-type(2) {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='600' preserveAspectRatio='none'%3E%3Cfilter id='o' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.007 0.011' numOctaves='2' seed='23'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.2 0 0 0 -0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23o)'/%3E%3C/svg%3E");
+      opacity: calc(var(--olas-opacidad) * 0.7);
+    }
+
+    .card, .stepper {
+      -webkit-backdrop-filter: saturate(190%) blur(22px);
+      backdrop-filter: saturate(190%) blur(22px);
+    }
+
+    .top-header {
+      -webkit-backdrop-filter: saturate(190%) blur(18px);
+      backdrop-filter: saturate(190%) blur(18px);
+    }
+
+    /* Se retiran la vista previa de fórmula (paso 2) y la memoria de cálculo (paso 3) */
+    .formula-preview-card, details.calc-memory { display: none !important; }
+
+    /* ================================================================== */
+    /* BARRA DE PASOS: UNA BURBUJA QUE SE DIVIDE AL AVANZAR Y SE FUSIONA   */
+    /* AL REGRESAR                                                         */
+    /* ================================================================== */
+    .stepper {
+      --n: 1;
+      --gap: 16px;
+      --h: 52px;
+      display: block;
+      position: relative;
+      height: var(--h);
+      padding: 0;
+      background: none;
+      border: none;
+      box-shadow: none;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+
+    .stepper[data-step="2"] { --n: 2; }
+    .stepper[data-step="3"] { --n: 3; }
+    .stepper::before { display: none; }
+
+    /* Las burbujas van en una capa aparte con el filtro que las hace fundirse; el texto queda nítido encima */
+    .burbujas {
+      position: absolute;
+      inset: 0;
+      filter: url(#filtroLiquido) drop-shadow(0 8px 18px var(--burbuja-sombra));
+      opacity: var(--burbuja-opacidad);
+      pointer-events: none;
+    }
+
+    .burbujas i, .stepper .step-item {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      left: calc(var(--i) * (100% + var(--gap)) / var(--n));
+      width: calc((100% - (var(--n) - 1) * var(--gap)) / var(--n));
+      transition: left 1000ms cubic-bezier(0.65, 0, 0.35, 1), width 1000ms cubic-bezier(0.65, 0, 0.35, 1), opacity 200ms ease;
+    }
+
+    .burbujas i { background: #ffffff; border-radius: 999px; }
+    .burbujas i:nth-child(1), #stepIndicator1 { --i: 0; }
+    .burbujas i:nth-child(2), #stepIndicator2 { --i: 1; }
+    .burbujas i:nth-child(3), #stepIndicator3 { --i: 2; }
+
+    /* Los pasos que aún no existen esperan plegados dentro del extremo de la última burbuja */
+    .stepper[data-step="1"] .burbujas i:nth-child(n+2), .stepper[data-step="1"] .step-item:not(#stepIndicator1),
+    .stepper[data-step="2"] .burbujas i:nth-child(3), .stepper[data-step="2"] #stepIndicator3 {
+      left: calc(100% - var(--h));
+      width: var(--h);
+    }
+
+    .stepper .step-item { justify-content: center; border-radius: 999px; opacity: 0; pointer-events: none; }
+
+    .stepper .step-item.active, .stepper .step-item.completed {
+      opacity: 1;
+      pointer-events: auto;
+      transition: left 1000ms cubic-bezier(0.65, 0, 0.35, 1), width 1000ms cubic-bezier(0.65, 0, 0.35, 1), opacity 350ms ease 450ms;
+    }
+
+    :root { --burbuja-opacidad: 0.66; --burbuja-sombra: rgba(20, 56, 128, 0.16); }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --burbuja-opacidad: 0.13; --burbuja-sombra: rgba(0, 0, 0, 0.5);
+        --bg: #02040b;
+        --olas-opacidad: 0.10;
+        --gota-1: #12338a; --gota-2: #070f29; --gota-3: #0b2f8c; --gota-4: #0a1638;
+        --wallpaper:
+          radial-gradient(60% 50% at 90% 5%, #0e2a6e 0%, rgba(14, 42, 110, 0) 70%),
+          radial-gradient(60% 60% at 5% 95%, #081a45 0%, rgba(8, 26, 69, 0) 70%),
+          linear-gradient(160deg, #050a18 0%, #010207 100%);
+      }
+      .fondo-liquido i { opacity: 0.6; }
+    }
+
+    /* ================================================================== */
+    /* LUZ DE SELECCIÓN: PASA COMO LÍQUIDO DE UNA OPCIÓN A LA OTRA         */
+    /* ================================================================== */
+    .choice-grid-2 { position: relative; }
+
+    .luz-seleccion {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      filter: url(#filtroLuz) drop-shadow(0 0 10px var(--accent-ring));
+    }
+
+    .luz-seleccion i {
+      position: absolute;
+      background: var(--accent);
+      border-radius: 14px;
+      transform: scale(0);
+      will-change: transform;
+    }
+
+    /* El cuerpo de los botones también es líquido: una capa de gotas detrás del texto */
+    .cuerpo-opciones {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      filter: url(#filtroCuerpo);
+      opacity: var(--cuerpo-opacidad);
+    }
+
+    .cuerpo-opciones i { position: absolute; background: #ffffff; border-radius: 14px; will-change: transform; }
+
+    /* Con las capas activas, las tarjetas ya no pintan fondo ni marco propios */
+    .con-luz .choice-card, .con-luz .choice-card.selected, .con-luz .choice-card:not(.selected):hover {
+      z-index: 1;
+      border-color: transparent;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    :root { --cuerpo-opacidad: 0.9; }
+    @media (prefers-color-scheme: dark) { :root { --cuerpo-opacidad: 0.2; } }
+
+    /* ================================================================== */
+    /* RESPONSIVE                                                         */
+    /* ================================================================== */
+    @media (max-width: 760px) {
+      .col-8, .col-6, .col-4 { grid-column: span 12; }
+      .result-grid { grid-template-columns: 1fr; }
+      .cert-meta { text-align: left; }
+      .card-header, .certificate-banner { padding: 1.4rem 1.25rem 0; }
+      .card-body { padding: 1.25rem 1.25rem 1.5rem; }
+      .page-hero { padding: 1.75rem 0 1.25rem; }
+      .tech-badge { display: none; }
+      .step-label { display: none; }
+      .step-item { padding: 0.5rem 0.55rem; gap: 0.45rem; min-height: 46px; }
+      .step-title { font-size: 0.8rem; }
+      .card-actions { flex-direction: column-reverse; align-items: stretch; }
+      .card-actions .btn { width: 100%; }
+      .actions-group { flex-direction: column; }
+      .card-actions > .form-hint { text-align: center; }
+      .age-result-highlight { align-items: flex-start; margin-left: 0; }
+      .modal-backdrop { padding: 0; align-items: flex-end; }
+      .modal-dialog { border-radius: var(--r-xl) var(--r-xl) 0 0; max-height: 92dvh; transform: translateY(100%); opacity: 1; }
+    }
+
+    @media (max-width: 480px) {
+      #grupoCategoriaProducto { grid-template-columns: 1fr; }
+      .choice-card:not(.product-card) { padding: 0.7rem 2.2rem 0.7rem 0.8rem; }
+      .choice-card:not(.product-card)::after { right: 0.65rem; width: 18px; height: 18px; background-size: 11px; }
+      .financial-highlight { grid-template-columns: 1fr; }
+      .stepper { --h: 58px; --gap: 14px; }
+      .step-item { flex-direction: column; justify-content: center; gap: 0.2rem; padding: 0.45rem 0.25rem; min-height: 58px; }
+      .step-text { align-items: center; max-width: 100%; }
+      .step-title { font-size: 0.74rem; }
+      .step-circle { width: 22px; height: 22px; font-size: 0.72rem; }
+      .brand-name { font-size: 0.88rem; }
+    }
+
+    /* ================================================================== */
+    /* ACCESIBILIDAD: MOVIMIENTO, TRANSPARENCIA, CONTRASTE                */
+    /* ================================================================== */
+    @media (prefers-reduced-motion: reduce) {
+      .card, :root[data-dir="back"] .card, [data-reveal], .form-grid > .form-group, .alert-box { animation-name: fade; }
+      .stepper::before, .burbujas i, .stepper .step-item { transition-duration: 0.01ms !important; transition-delay: 0ms !important; }
+      .modal-dialog, .modal-backdrop.is-open .modal-dialog { transform: none; transition: opacity 200ms ease; }
+      .btn:active, .btn-chip:active, .choice-card:active, .num-btn:active, .btn-table-viewer:active, .modal-close:active { transform: none; }
+      details.calc-memory::details-content { transition: none; }
+    }
+
+    @media (prefers-reduced-transparency: reduce) {
+      :root { --surface: #ffffff; --fill: #eef3fb; --field: #ffffff; --modal-surface: #ffffff; --pill: #ffffff; }
+      .fondo-liquido { display: none; }
+      .top-header, .card, .stepper, .modal-dialog { -webkit-backdrop-filter: none; backdrop-filter: none; }
+      .top-header { background: var(--bg); }
+    }
+
+    @media (prefers-contrast: more) {
+      :root { --hairline: rgba(0, 0, 0, 0.4); --hairline-strong: rgba(0, 0, 0, 0.6); --text-3: #3a3a3c; }
+      .top-header { background: var(--bg); border-bottom-color: var(--hairline-strong); }
+    }
+
+    /* ================================================================== */
+    /* IMPRESIÓN                                                          */
+    /* ================================================================== */
+    @media print {
+      :root {
+        --bg: #ffffff; --surface: #ffffff; --surface-2: #f5f5f7; --fill: #f5f5f7; --field: #ffffff;
+        --hairline: #c7c7cc; --hairline-strong: #8e8e93;
+        --text: #000000; --text-2: #222222; --text-3: #444444;
+        --accent: #000000; --accent-tint: #ececec; --pill: #ffffff; --ink: #ffffff; --ink-text: #000000; --ink-text-2: #333333;
+        --success: #000000; --danger: #000000;
+      }
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      body { background: #ffffff !important; padding: 0 !important; font-size: 11pt; }
+      body::before, .fondo-liquido { display: none; }
+      .card { background: #ffffff !important; border: none !important; -webkit-backdrop-filter: none; backdrop-filter: none; }
+      .fin-metric, .info-panel, details.calc-memory { box-shadow: none !important; }
+      .fin-metric.primary-result { background: #ffffff !important; }
+      .fin-metric.primary-result .fin-label { color: #333333 !important; }
+      .top-header, .stepper, .no-print, .modal-backdrop { display: none !important; }
+      .main-wrapper { max-width: 100% !important; padding: 0 !important; }
+      .page-hero { padding: 0 0 0.75rem !important; }
+      .page-hero h1 { font-size: 16pt; max-width: none; }
+      .page-hero p { font-size: 9.5pt; margin-top: 0.25rem; max-width: none; }
+      .card { box-shadow: none !important; border-radius: 0 !important; overflow: visible !important; }
+      .certificate-banner { padding: 0.75rem 0 0 !important; border-top: 1.5px solid #000000; }
+      .card-body { padding: 0.75rem 0 0 !important; }
+      .fin-metric, .info-panel, details.calc-memory { border: 1px solid #c7c7cc; break-inside: avoid; }
+      .fin-metric.primary-result { border: 1.5px solid #000000; padding: 1rem 1.25rem; }
+      .fin-metric.primary-result .fin-value { color: #000000 !important; font-size: 22pt; }
+      .step-by-step-box { background: #f5f5f7 !important; color: #000000 !important; border: 1px solid #c7c7cc; white-space: pre-wrap; }
+      .step-by-step-box .hl-cyan, .step-by-step-box .hl-green, .step-by-step-box .hl-amber { color: #000000 !important; }
+      .summary-chevron { display: none; }
+      .table-responsive { overflow: visible; }
+      table.comm-table { font-size: 7.5pt; }
+      table.comm-table th { position: static; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Fondo líquido (decorativo) y filtro de deformación para el cambio de paso -->
+  <div class="fondo-liquido no-print" id="fondoLiquido" aria-hidden="true"><i></i><i></i><i></i><i></i><span></span><span></span></div>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <filter id="filtroLiquido" x="-6%" y="-60%" width="112%" height="220%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="difuso" />
+      <feColorMatrix in="difuso" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 24 -10" result="fundido" />
+      <feTurbulence id="ruidoLiquido" type="fractalNoise" baseFrequency="0.012 0.03" numOctaves="2" seed="4" result="ruido" />
+      <feDisplacementMap id="desplazamientoLiquido" in="fundido" in2="ruido" scale="0" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+    <!-- Cuerpo de los botones: funde las gotas, relleno translúcido y borde luminoso -->
+    <filter id="filtroCuerpo" x="-10%" y="-30%" width="120%" height="160%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="difuso" />
+      <feColorMatrix in="difuso" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9" result="gota" />
+      <feMorphology in="gota" operator="erode" radius="1" result="interior" />
+      <feComposite in="gota" in2="interior" operator="out" result="contorno" />
+      <feComponentTransfer in="gota" result="relleno"><feFuncA type="linear" slope="0.5" /></feComponentTransfer>
+      <feMerge><feMergeNode in="relleno" /><feMergeNode in="contorno" /></feMerge>
+    </filter>
+    <!-- Luz de selección: funde las gotas, deja un relleno tenue y dibuja el contorno -->
+    <filter id="filtroLuz" x="-10%" y="-30%" width="120%" height="160%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="difuso" />
+      <feColorMatrix in="difuso" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9" result="gota" />
+      <feMorphology in="gota" operator="erode" radius="1.6" result="interior" />
+      <feComposite in="gota" in2="interior" operator="out" result="contorno" />
+      <feComponentTransfer in="gota" result="relleno"><feFuncA type="linear" slope="0.14" /></feComponentTransfer>
+      <feMerge><feMergeNode in="relleno" /><feMergeNode in="contorno" /></feMerge>
+    </filter>
+  </svg>
+
+  <!-- BARRA SUPERIOR -->
+  <header class="top-header no-print" id="barraSuperior">
+    <div class="header-container">
+      <div class="brand-block">
+        <div class="brand-icon" aria-hidden="true">ä</div>
+        <span class="brand-name">Cotizador Actuarial</span>
+      </div>
+      <div class="header-badges">
+        <span class="tech-badge">Rádix l₁₂ = 10,000,000</span>
+        <span class="tech-badge">ω = 100 años</span>
+        <button type="button" class="btn-table-viewer no-print" id="btnAbrirTablaModal" aria-haspopup="dialog">
+          <svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="2.5" width="12" height="11" rx="2"/><path d="M2 6.5h12M2 10h12M6.5 6.5v7"/></svg>
+          Tabla CNSF 2000-I
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-wrapper">
+
+    <div class="page-hero">
+      <div class="eyebrow">Tabla de Mortalidad CNSF 2000-I · Tasa técnica i = 5.00 % anual</div>
+      <h1>Cotizador de Seguros de Vida y Anualidades Contingentes</h1>
+      <p class="no-print">Capture los datos del asegurado, configure el producto y obtenga la prima con su memoria de cálculo.</p>
+    </div>
+
+    <!-- STEPPER DE PROGRESO -->
+    <nav class="stepper no-print" id="stepperNav" data-step="1" aria-label="Pasos de cotización">
+      <div class="burbujas" aria-hidden="true"><i></i><i></i><i></i></div>
+      <button type="button" class="step-item active" id="stepIndicator1" aria-current="step" disabled>
+        <span class="step-circle">1</span>
+        <span class="step-text">
+          <span class="step-label">Paso 1</span>
+          <span class="step-title">Asegurado</span>
+        </span>
+      </button>
+      <button type="button" class="step-item" id="stepIndicator2" disabled>
+        <span class="step-circle">2</span>
+        <span class="step-text">
+          <span class="step-label">Paso 2</span>
+          <span class="step-title">Producto</span>
+        </span>
+      </button>
+      <button type="button" class="step-item" id="stepIndicator3" disabled>
+        <span class="step-circle">3</span>
+        <span class="step-text">
+          <span class="step-label">Paso 3</span>
+          <span class="step-title">Resultado</span>
+        </span>
+      </button>
+    </nav>
+
+    <!-- =================================================================== -->
+    <!-- PASO 1: DATOS DEL ASEGURADO                                         -->
+    <!-- =================================================================== -->
+    <section class="card" id="seccionPaso1" aria-labelledby="tituloPaso1">
+      <div class="card-header">
+        <div>
+          <div class="step-eyebrow">Paso 1 de 3</div>
+          <h2 id="tituloPaso1" tabindex="-1">Datos del asegurado</h2>
+          <p>Ingrese los datos del prospecto (edad permitida de 14 a 75 años) y elija qué desea cotizar.</p>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <form id="formPaso1" novalidate>
+          <div class="form-grid">
+
+            <!-- Nombre completo -->
+            <div class="form-group col-8">
+              <label class="form-label" for="nombreAsegurado">
+                <span>Nombre completo</span>
+              </label>
+              <input
+                type="text"
+                id="nombreAsegurado"
+                class="input-control"
+                placeholder="Ej. Juan Carlos Garza Treviño"
+                autocomplete="name"
+                autocapitalize="words"
+                spellcheck="false"
+                required
+              />
+              <span class="form-hint">Aparecerá en el comprobante de cotización.</span>
+            </div>
+
+            <!-- Edad Real -->
+            <div class="form-group col-4">
+              <label class="form-label" for="edadReal">
+                <span>Edad (años cumplidos)</span>
+              </label>
+              <div class="num-stepper">
+                <button type="button" class="num-btn" data-step-target="edadReal" data-step="-1" aria-label="Disminuir edad">
+                  <svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9"/></svg>
+                </button>
+                <input
+                  type="number"
+                  id="edadReal"
+                  class="input-control"
+                  min="14"
+                  max="75"
+                  step="1"
+                  value="30"
+                  placeholder="14 – 75"
+                  inputmode="numeric"
+                  required
+                />
+                <button type="button" class="num-btn" data-step-target="edadReal" data-step="1" aria-label="Aumentar edad">
+                  <svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9M8 3.5v9"/></svg>
+                </button>
+              </div>
+              <span class="form-hint">Número entero entre 14 y 75.</span>
+            </div>
+
+            <!-- Alerta de validación Paso 1 -->
+            <div class="col-12 hidden" id="alertaPaso1" role="alert">
+              <div class="alert-box alert-error">
+                <span class="alert-icon" aria-hidden="true">!</span>
+                <div id="mensajeAlertaPaso1"></div>
+              </div>
+            </div>
+
+            <!-- Sexo -->
+            <div class="form-group col-6">
+              <span class="form-label" id="lblGrupoSexo">
+                <span>Sexo</span>
+              </span>
+              <div class="choice-grid-2" id="grupoSexo" role="radiogroup" aria-labelledby="lblGrupoSexo">
+                <label class="choice-card selected" data-radio-group="sexo">
+                  <input type="radio" name="sexo" value="M" checked />
+                  <div class="choice-content">
+                    <span class="choice-title">Masculino</span>
+                    <span class="choice-desc">Sin reducción por sexo</span>
+                    <span class="choice-badge">Ajuste: 0 años</span>
+                  </div>
+                </label>
+                <label class="choice-card" data-radio-group="sexo">
+                  <input type="radio" name="sexo" value="F" />
+                  <div class="choice-content">
+                    <span class="choice-title">Femenino</span>
+                    <span class="choice-desc">Mayor esperanza de vida</span>
+                    <span class="choice-badge">Ajuste: -2 años</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- ¿Fuma? -->
+            <div class="form-group col-6">
+              <span class="form-label" id="lblGrupoFuma">
+                <span>¿Fuma?</span>
+              </span>
+              <div class="choice-grid-2" id="grupoFuma" role="radiogroup" aria-labelledby="lblGrupoFuma">
+                <label class="choice-card selected" data-radio-group="fuma">
+                  <input type="radio" name="fuma" value="no" checked />
+                  <div class="choice-content">
+                    <span class="choice-title">No fuma</span>
+                    <span class="choice-desc">Descuento por hábito saludable</span>
+                    <span class="choice-badge">Ajuste: -2 años</span>
+                  </div>
+                </label>
+                <label class="choice-card" data-radio-group="fuma">
+                  <input type="radio" name="fuma" value="si" />
+                  <div class="choice-content">
+                    <span class="choice-title">Fuma</span>
+                    <span class="choice-desc">Mortalidad estándar de la tabla</span>
+                    <span class="choice-badge">Ajuste: 0 años</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Panel en vivo de Edad Actuarial Ajustada (x) -->
+            <div class="col-12">
+              <div class="actuarial-age-box" id="boxEdadActuarialPreview" aria-live="polite">
+                <div>
+                  <div class="box-kicker">Edad actuarial ajustada, calculada en vivo</div>
+                  <div class="age-formula-steps" id="desgloseEdadPreview">
+                    <!-- Dinámico via JS -->
+                  </div>
+                </div>
+                <div class="age-result-highlight">
+                  <span>Edad actuarial</span>
+                  <span class="big-x" id="valorEdadActuarialPreview">x = 28</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Selección Principal: Tipo de Producto a Cotizar -->
+            <div class="form-group col-12">
+              <span class="form-label" id="lblGrupoProducto">
+                <span>¿Qué desea cotizar?</span>
+              </span>
+              <div class="choice-grid-2" id="grupoCategoriaProducto" role="radiogroup" aria-labelledby="lblGrupoProducto">
+                <label class="choice-card product-card selected" data-radio-group="categoriaProducto">
+                  <input type="radio" name="categoriaProducto" value="seguro" checked />
+                  <div class="choice-content">
+                    <span class="choice-title">Seguro de vida</span>
+                    <span class="choice-desc">
+                      Temporal, Diferido Temporal, Diferido Vitalicio, Dotal Puro, Dotal Mixto y Vitalicio.
+                    </span>
+                    <span class="choice-badge">PNU · PNN · Pagos limitados (h)</span>
+                  </div>
+                </label>
+                <label class="choice-card product-card" data-radio-group="categoriaProducto">
+                  <input type="radio" name="categoriaProducto" value="anualidad" />
+                  <div class="choice-content">
+                    <span class="choice-title">Anualidad contingente</span>
+                    <span class="choice-desc">
+                      Rentas vitalicias y temporales, inmediatas o diferidas, anticipadas (ä) o vencidas (a).
+                    </span>
+                    <span class="choice-badge">Valor presente actuarial</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="card-actions">
+            <span class="form-hint">Todos los campos son obligatorios.</span>
+            <button type="submit" class="btn btn-primary">
+              Continuar
+              <svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5L10.5 8 6 12.5"/></svg>
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- PASO 2: CONFIGURACIÓN DINÁMICA DEL PRODUCTO                         -->
+    <!-- =================================================================== -->
+    <section class="card hidden" id="seccionPaso2" aria-labelledby="tituloPaso2">
+      <div class="card-header">
+        <div>
+          <div class="step-eyebrow">Paso 2 de 3</div>
+          <h2 id="tituloPaso2" tabindex="-1">Configuración del producto</h2>
+          <p id="subtituloPaso2">Especifique la cobertura, modalidad de pago y plazos actuariales.</p>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" id="btnVolverPaso1Top">
+          Editar asegurado
+        </button>
+      </div>
+
+      <div class="card-body">
+
+        <!-- Resumen del Asegurado -->
+        <div class="insured-summary-banner">
+          <div class="banner-items">
+            <div class="banner-item">
+              <span class="lbl">Asegurado(a)</span>
+              <span class="val" id="resumenNombrePaso2">—</span>
+            </div>
+            <div class="banner-item">
+              <span class="lbl">Edad real</span>
+              <span class="val" id="resumenEdadRealPaso2">—</span>
+            </div>
+            <div class="banner-item">
+              <span class="lbl">Perfil</span>
+              <span class="val" id="resumenPerfilPaso2">—</span>
+            </div>
+            <div class="banner-item">
+              <span class="lbl">Edad actuarial (x)</span>
+              <span class="val accent" id="resumenEdadActuarialPaso2">—</span>
+            </div>
+            <div class="banner-item">
+              <span class="lbl">Plazo máximo (ω − x)</span>
+              <span class="val accent" id="resumenPlazoMaxPaso2">—</span>
+            </div>
+          </div>
+        </div>
+
+        <form id="formPaso2" novalidate>
+
+          <!-- =============================================================== -->
+          <!-- SUB-FORMULARIO A: SEGURO DE VIDA                                -->
+          <!-- =============================================================== -->
+          <div id="panelConfigSeguro" class="form-grid">
+
+            <!-- Tipo de Seguro -->
+            <div class="form-group col-6">
+              <label class="form-label" for="tipoSeguro">
+                <span>Tipo de seguro</span>
+              </label>
+              <select id="tipoSeguro" class="select-control">
+                <option value="temporal">1. Temporal (n años)</option>
+                <option value="diferido_temporal">2. Diferido Temporal (m años diferido, n temporal)</option>
+                <option value="diferido_vitalicio">3. Diferido Vitalicio (m años de diferimiento)</option>
+                <option value="dotal_puro">4. Dotal Puro (n años)</option>
+                <option value="dotal_mixto">5. Dotal Mixto (n años)</option>
+                <option value="vitalicio">6. Vitalicio (Ordinario de vida)</option>
+              </select>
+              <span class="form-hint" id="descTipoSeguro">Cobertura por fallecimiento durante n años.</span>
+            </div>
+
+            <!-- Modalidad de Prima -->
+            <div class="form-group col-6">
+              <label class="form-label" for="modalidadPrima">
+                <span>Modalidad de prima</span>
+              </label>
+              <select id="modalidadPrima" class="select-control">
+                <option value="PNU">1. Prima Neta Única (PNU)</option>
+                <option value="PNN">2. Prima Neta Nivelada (PNN)</option>
+                <option value="PNN_LIMITADOS">3. Prima Neta Nivelada con Pagos Limitados (h pagos)</option>
+              </select>
+              <span class="form-hint" id="descModalidadPrima">Pago único al inicio de la vigencia (x).</span>
+            </div>
+
+            <!-- Variable dinámica: Diferimiento (m) para Seguro -->
+            <div class="form-group col-4 hidden" id="grupoSegDiferimiento">
+              <label class="form-label" for="segDiferimientoM">
+                <span>Diferimiento (m años)</span>
+              </label>
+              <input
+                type="number"
+                id="segDiferimientoM"
+                class="input-control"
+                min="1"
+                max="86"
+                step="1"
+                value="10"
+                inputmode="numeric"
+              />
+              <span class="form-hint" id="hintSegM">Periodo inicial de espera sin cobertura (m ≥ 1).</span>
+            </div>
+
+            <!-- Variable dinámica: Temporalidad (n) para Seguro -->
+            <div class="form-group col-4" id="grupoSegTemporalidad">
+              <label class="form-label" for="segTemporalidadN">
+                <span>Temporalidad (n años)</span>
+              </label>
+              <input
+                type="number"
+                id="segTemporalidadN"
+                class="input-control"
+                min="1"
+                max="86"
+                step="1"
+                value="20"
+                inputmode="numeric"
+              />
+              <span class="form-hint" id="hintSegN">Duración de la cobertura del seguro (n ≥ 1).</span>
+            </div>
+
+            <!-- Variable dinámica: Número de Pagos (h) para Pagos Limitados -->
+            <div class="form-group col-4 hidden" id="grupoSegPagosH">
+              <label class="form-label" for="segPagosH">
+                <span>Número de pagos (h años)</span>
+              </label>
+              <input
+                type="number"
+                id="segPagosH"
+                class="input-control"
+                min="1"
+                max="86"
+                step="1"
+                value="10"
+                inputmode="numeric"
+              />
+              <span class="form-hint" id="hintSegH">Cantidad de primas anuales anticipadas.</span>
+            </div>
+
+            <!-- Selector de periodo de pago en PNN cuando el seguro es Diferido -->
+            <div class="form-group col-12 hidden" id="grupoCriterioPNNDiferido">
+              <label class="form-label" for="criterioPNNDiferido">
+                <span>Periodo de pago de la PNN en seguro diferido</span>
+              </label>
+              <select id="criterioPNNDiferido" class="select-control">
+                <option value="diferimiento">Durante el periodo de diferimiento m años: dividir entre ä_{x:m|} = (N_x - N_{x+m}) / D_x (Estándar)</option>
+                <option value="temporalidad">Durante n años desde edad x (o vitalicio ä_x): dividir entre ä_{x:n|} o ä_x</option>
+                <option value="total">Durante todo el horizonte desde edad x (m + n años): dividir entre ä_{x:m+n|}</option>
+              </select>
+              <span class="form-hint">Por defecto divide la PNU entre ä_{x:m|} conforme a las reglas actuariales especificadas.</span>
+            </div>
+
+            <!-- Suma Asegurada (SA) -->
+            <div class="form-group col-12">
+              <label class="form-label" for="sumaAsegurada">
+                <span>Suma asegurada (SA, en MXN)</span>
+                <span class="amount-echo" data-echo-for="sumaAsegurada"></span>
+              </label>
+              <input
+                type="number"
+                id="sumaAsegurada"
+                class="input-control"
+                min="1"
+                max="1000000000000"
+                step="any"
+                value="1000000"
+                placeholder="Ej. 1000000"
+                inputmode="decimal"
+              />
+              <div class="quick-amounts" role="group" aria-label="Montos frecuentes de suma asegurada">
+                <button type="button" class="btn-chip" data-target="sumaAsegurada" data-val="100000">$100,000</button>
+                <button type="button" class="btn-chip" data-target="sumaAsegurada" data-val="500000">$500,000</button>
+                <button type="button" class="btn-chip" data-target="sumaAsegurada" data-val="1000000">$1,000,000</button>
+                <button type="button" class="btn-chip" data-target="sumaAsegurada" data-val="2500000">$2,500,000</button>
+                <button type="button" class="btn-chip" data-target="sumaAsegurada" data-val="5000000">$5,000,000</button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- =============================================================== -->
+          <!-- SUB-FORMULARIO B: ANUALIDAD CONTINGENTE                         -->
+          <!-- =============================================================== -->
+          <div id="panelConfigAnualidad" class="form-grid hidden">
+
+            <!-- Momento de Pago -->
+            <div class="form-group col-6">
+              <span class="form-label" id="lblGrupoMomento">
+                <span>Momento de pago de la renta</span>
+              </span>
+              <div class="choice-grid-2" id="grupoMomentoAnualidad" role="radiogroup" aria-labelledby="lblGrupoMomento">
+                <label class="choice-card selected" data-radio-group="momentoAnualidad">
+                  <input type="radio" name="momentoAnualidad" value="anticipada" checked />
+                  <div class="choice-content">
+                    <span class="choice-title">Anticipada (ä)</span>
+                    <span class="choice-desc">Pagos al inicio de cada año</span>
+                  </div>
+                </label>
+                <label class="choice-card" data-radio-group="momentoAnualidad">
+                  <input type="radio" name="momentoAnualidad" value="vencida" />
+                  <div class="choice-content">
+                    <span class="choice-title">Vencida (a)</span>
+                    <span class="choice-desc">Pagos al final de cada año</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Tipo de Anualidad -->
+            <div class="form-group col-6">
+              <label class="form-label" for="tipoAnualidad">
+                <span>Tipo de anualidad</span>
+              </label>
+              <select id="tipoAnualidad" class="select-control">
+                <option value="temporal">1. Temporal (n años)</option>
+                <option value="vitalicia">2. Vitalicia</option>
+                <option value="diferida_temporal">3. Diferida Temporal (m años diferida, n temporal)</option>
+                <option value="diferida_vitalicia">4. Diferida Vitalicia (m años de diferimiento)</option>
+              </select>
+              <span class="form-hint" id="descTipoAnualidad">Pagos contingentes sujetos a supervivencia durante n años.</span>
+            </div>
+
+            <!-- Variable dinámica: Diferimiento (m) para Anualidad -->
+            <div class="form-group col-6 hidden" id="grupoAnuDiferimiento">
+              <label class="form-label" for="anuDiferimientoM">
+                <span>Diferimiento (m años)</span>
+              </label>
+              <input
+                type="number"
+                id="anuDiferimientoM"
+                class="input-control"
+                min="1"
+                max="86"
+                step="1"
+                value="10"
+                inputmode="numeric"
+              />
+              <span class="form-hint" id="hintAnuM">Años de espera antes de iniciar el periodo de renta (m ≥ 1).</span>
+            </div>
+
+            <!-- Variable dinámica: Temporalidad (n) para Anualidad -->
+            <div class="form-group col-6" id="grupoAnuTemporalidad">
+              <label class="form-label" for="anuTemporalidadN">
+                <span>Temporalidad (n años de renta)</span>
+              </label>
+              <input
+                type="number"
+                id="anuTemporalidadN"
+                class="input-control"
+                min="1"
+                max="86"
+                step="1"
+                value="15"
+                inputmode="numeric"
+              />
+              <span class="form-hint" id="hintAnuN">Número de años durante los cuales se pagará la renta (n ≥ 1).</span>
+            </div>
+
+            <!-- Monto de la Renta Anual (R) -->
+            <div class="form-group col-12">
+              <label class="form-label" for="montoRenta">
+                <span>Renta anual (R, en MXN)</span>
+                <span class="amount-echo" data-echo-for="montoRenta"></span>
+              </label>
+              <input
+                type="number"
+                id="montoRenta"
+                class="input-control"
+                min="1"
+                max="1000000000000"
+                step="any"
+                value="120000"
+                placeholder="Ej. 120000"
+                inputmode="decimal"
+              />
+              <div class="quick-amounts" role="group" aria-label="Montos frecuentes de renta anual">
+                <button type="button" class="btn-chip" data-target="montoRenta" data-val="50000">$50,000</button>
+                <button type="button" class="btn-chip" data-target="montoRenta" data-val="100000">$100,000</button>
+                <button type="button" class="btn-chip" data-target="montoRenta" data-val="120000">$120,000</button>
+                <button type="button" class="btn-chip" data-target="montoRenta" data-val="240000">$240,000</button>
+                <button type="button" class="btn-chip" data-target="montoRenta" data-val="500000">$500,000</button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Vista Previa de la Fórmula Actuarial -->
+          <div class="formula-preview-card" aria-live="polite">
+            <div class="formula-preview-header">
+              <span>Fórmula</span>
+              <span id="etiquetaEdadesPreview"></span>
+            </div>
+            <div class="formula-expression" id="textoFormulaPreview">
+              —
+            </div>
+          </div>
+
+          <!-- Alerta de Validación Paso 2 -->
+          <div class="hidden" id="alertaPaso2" role="alert" style="margin-top: 1.25rem;">
+            <div class="alert-box alert-error">
+              <span class="alert-icon" aria-hidden="true">!</span>
+              <div id="mensajeAlertaPaso2"></div>
+            </div>
+          </div>
+
+          <!-- Botones de Acción Paso 2 -->
+          <div class="card-actions">
+            <button type="button" class="btn btn-secondary" id="btnVolverPaso1Bottom">
+              <svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg>
+              Atrás
+            </button>
+            <button type="submit" class="btn btn-emerald">
+              Calcular cotización
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- PASO 3: PANTALLA DE RESULTADOS (COMPROBANTE Y MEMORIA DE CÁLCULO)   -->
+    <!-- =================================================================== -->
+    <section class="card hidden" id="seccionPaso3" aria-labelledby="certTituloProducto">
+      <div class="certificate-banner">
+        <div class="cert-title-group">
+          <div class="step-eyebrow" style="font-size: 0.78rem; font-weight: 600; color: var(--text-3); margin-bottom: 0.2rem;">Comprobante de cotización</div>
+          <h2 id="certTituloProducto" tabindex="-1">Certificado de Cotización Actuarial</h2>
+          <p>Tabla de Mortalidad CNSF 2000-I · Tasa de interés técnico i = 5.00 % anual · Rádix l₁₂ = 10,000,000</p>
+        </div>
+        <div class="cert-meta">
+          <div class="folio" id="certFolio">FOLIO: CNSF-2026-0001</div>
+          <div id="certFecha">Fecha: —</div>
+        </div>
+      </div>
+
+      <div class="card-body">
+
+        <!-- Resultado principal -->
+        <div class="financial-highlight">
+          <div class="fin-metric primary-result" data-reveal style="--i: 0">
+            <span class="fin-label" id="lblPrimaCalculada">Prima Calculada</span>
+            <span class="fin-value" id="valPrimaCalculada">$0.00 MXN</span>
+            <span class="fin-sub" id="subPrimaCalculada">Exacto: $0.0000 MXN</span>
+          </div>
+
+          <div class="fin-metric" data-reveal style="--i: 1">
+            <span class="fin-label" id="lblMontoBaseResultado">Suma Asegurada (SA)</span>
+            <span class="fin-value" id="valMontoBaseResultado">$1,000,000.00 MXN</span>
+            <span class="fin-sub" id="subMontoBaseResultado">Beneficio nominal contratado</span>
+          </div>
+
+          <div class="fin-metric" data-reveal style="--i: 2">
+            <span class="fin-label" id="lblFactorUnitario">Factor Actuarial Unitario</span>
+            <span class="fin-value" id="valFactorUnitario">0.00000000</span>
+            <span class="fin-sub" id="subFactorUnitario">Por cada $1.00 MXN de beneficio</span>
+          </div>
+        </div>
+
+        <!-- Dos Columnas de Resumen: Asegurado y Producto -->
+        <div class="result-grid">
+          <div class="info-panel" data-reveal style="--i: 3">
+            <div class="info-panel-title">Asegurado y edad actuarial</div>
+            <div class="kv-list" id="listaDatosAseguradoResultado">
+              <!-- Dinámico via JS -->
+            </div>
+          </div>
+
+          <div class="info-panel" data-reveal style="--i: 4">
+            <div class="info-panel-title">Producto cotizado</div>
+            <div class="kv-list" id="listaDatosProductoResultado">
+              <!-- Dinámico via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Desglose Opcional Desplegable: Memoria de Cálculo -->
+        <details class="calc-memory" id="memoriaCalculoDetails" data-reveal style="--i: 5" open>
+          <summary>
+            <span>Memoria de cálculo y valores conmutados utilizados (Dₓ, Nₓ, Mₓ)</span>
+            <span class="summary-chevron" aria-hidden="true">
+              <svg class="ico" viewBox="0 0 16 16"><path d="M3.5 6L8 10.5 12.5 6"/></svg>
+            </span>
+          </summary>
+          <div class="memory-content">
+            <div class="step-by-step-box" id="desglosePasoAPaso">
+              <!-- Dinámico via JS -->
+            </div>
+
+            <div>
+              <div class="table-caption">
+                Extracto de la tabla de valores conmutados CNSF 2000-I (i = 5 %) en las edades involucradas
+              </div>
+              <div class="table-responsive">
+                <table class="comm-table">
+                  <thead>
+                    <tr>
+                      <th>Edad (k)</th>
+                      <th style="text-align:left;">Rol en Fórmula</th>
+                      <th>q_k</th>
+                      <th>l_k</th>
+                      <th>d_k</th>
+                      <th>D_k</th>
+                      <th>N_k</th>
+                      <th>C_k</th>
+                      <th>M_k</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbodyConmutadosUsados">
+                    <!-- Dinámico via JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <!-- Botones de Acción del Comprobante -->
+        <div class="card-actions no-print">
+          <div class="actions-group">
+            <button type="button" class="btn btn-secondary" id="btnModificarParametros">
+              Modificar parámetros
+            </button>
+            <button type="button" class="btn btn-danger-outline" id="btnNuevaCotizacion">
+              Cerrar y cotizar de nuevo
+            </button>
+          </div>
+          <button type="button" class="btn btn-primary" id="btnImprimirComprobante">
+            <svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 6V2.5h7V6M4.5 11.5H3a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v3.5a1 1 0 0 1-1 1h-1.5M4.5 9.5h7v4h-7z"/></svg>
+            Imprimir o guardar PDF
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: TABLA DE MORTALIDAD CNSF 2000-I COMPLETA                       -->
+  <!-- ===================================================================== -->
+  <div class="modal-backdrop hidden no-print" id="modalTablaCompleta">
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="tituloModalTabla">
+      <div class="modal-header">
+        <div>
+          <h3 id="tituloModalTabla">
+            Tabla de mortalidad y valores conmutados CNSF 2000-I
+          </h3>
+          <p>
+            i = 5.00 % anual · Edades 12 a 100 (ω = 100) · Rádix l₁₂ = 10,000,000 · La fila resaltada es la edad actuarial x actual.
+          </p>
+        </div>
+        <button type="button" class="modal-close" id="btnCerrarTablaModal" aria-label="Cerrar tabla">
+          <svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive" id="scrollTablaCompleta" tabindex="0">
+          <table class="comm-table">
+            <thead>
+              <tr>
+                <th>Edad x</th>
+                <th>q_x</th>
+                <th>p_x</th>
+                <th>l_x</th>
+                <th>d_x</th>
+                <th>C_x</th>
+                <th>D_x</th>
+                <th>M_x</th>
+                <th>N_x</th>
+                <th>S_x</th>
+                <th>R_x</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyTablaCompleta">
+              <!-- Generado al abrir -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- SCRIPT PRINCIPAL EMBEBIDO (100% AUTOCONTENIDO SIN DEPENDENCIAS)       -->
+  <!-- ===================================================================== -->
+  <script>
+    // 1. DICCIONARIO DE VALORES CONMUTADOS EMBEBIDO (CNSF 2000-I, i = 5%)
+const TABLA_CONMUTADOS = {
+  metadata: {"tabla": "CNSF 2000-I", "tasa_interes": 0.05, "factor_descuento_v": 0.9523809523809523, "radix": 10000000.0, "edad_min_tabla": 12, "edad_min_cotizacion": 14, "edad_max_cotizacion": 75, "omega": 100, "edad_max_padding": 150},
+  valores: {
+    "12": {"x": 12, "qx": 0.000396, "px": 0.999604, "lx": 10000000.0, "dx": 3959.9999999999995, "Dx": 5568374.181775591, "Cx": 2100.0725485553658, "Nx": 109321081.5220708, "Sx": 1944129562.509267, "Mx": 362608.395010312, "Rx": 16743483.307343733},
+    "13": {"x": 13, "qx": 0.000427, "px": 0.999573, "lx": 9996040.0, "dx": 4268.30908, "Dx": 5301113.433904389, "Cx": 2155.7861297877844, "Nx": 103752707.34029521, "Sx": 1834808480.9871962, "Mx": 360508.3224617566, "Rx": 16380874.912333421},
+    "14": {"x": 14, "qx": 0.00046, "px": 0.99954, "lx": 9991771.69092, "dx": 4596.214977823201, "Dx": 5046523.674731535, "Cx": 2210.857990834768, "Nx": 98451593.90639082, "Sx": 1731055773.646901, "Mx": 358352.5363319688, "Rx": 16020366.589871665},
+    "15": {"x": 15, "qx": 0.000495, "px": 0.999505, "lx": 9987175.475942178, "dx": 4943.651860591378, "Dx": 4804002.165563008, "Cx": 2264.743878051132, "Nx": 93405070.23165928, "Sx": 1632604179.74051, "Mx": 356141.67834113404, "Rx": 15662014.053539697},
+    "16": {"x": 16, "qx": 0.000533, "px": 0.999467, "lx": 9982231.824081587, "dx": 5320.529562235486, "Dx": 4572975.413801004, "Cx": 2321.329424338986, "Nx": 88601068.06609628, "Sx": 1539199109.5088508, "Mx": 353876.93446308293, "Rx": 15305872.375198564},
+    "17": {"x": 17, "qx": 0.000575, "px": 0.999425, "lx": 9976911.294519352, "dx": 5736.7239943486275, "Dx": 4352893.350386141, "Cx": 2383.7273109257435, "Nx": 84028092.65229528, "Sx": 1450598041.4427545, "Mx": 351555.60503874393, "Rx": 14951995.44073548},
+    "18": {"x": 18, "qx": 0.000619, "px": 0.999381, "lx": 9971174.570525004, "dx": 6172.157059154977, "Dx": 4143228.9873425416, "Cx": 2442.5321363476505, "Nx": 79675199.30190913, "Sx": 1366569948.7904592, "Mx": 349171.8777278182, "Rx": 14600439.835696736},
+    "19": {"x": 19, "qx": 0.000667, "px": 0.999333, "lx": 9965002.413465848, "dx": 6646.65660978172, "Dx": 3943489.8367613107, "Cx": 2505.054972495042, "Nx": 75531970.3145666, "Sx": 1286894749.48855, "Mx": 346729.34559147054, "Rx": 14251267.957968919},
+    "20": {"x": 20, "qx": 0.000718, "px": 0.999282, "lx": 9958355.756856067, "dx": 7150.099433422656, "Dx": 3753199.5514668482, "Cx": 2566.473598050664, "Nx": 71588480.47780529, "Sx": 1211362779.1739833, "Mx": 344224.2906189755, "Rx": 13904538.612377448},
+    "21": {"x": 21, "qx": 0.000773, "px": 0.999227, "lx": 9951205.657422645, "dx": 7692.281973187705, "Dx": 3571909.28970371, "Cx": 2629.6056008961596, "Nx": 67835280.92633843, "Sx": 1139774298.696178, "Mx": 341657.8170209248, "Rx": 13560314.321758473},
+    "22": {"x": 22, "qx": 0.000833, "px": 0.999167, "lx": 9943513.375449456, "dx": 8282.946641749397, "Dx": 3399188.7655454935, "Cx": 2696.6897539994247, "Nx": 64263371.63663473, "Sx": 1071939017.7698394, "Mx": 339028.21142002865, "Rx": 13218656.504737549},
+    "23": {"x": 23, "qx": 0.000897, "px": 0.999103, "lx": 9935230.428807708, "dx": 8911.901694640514, "Dx": 3234625.9440988516, "Cx": 2763.2947351015905, "Nx": 60864182.871089235, "Sx": 1007675646.1332047, "Mx": 336331.52166602924, "Rx": 12879628.29331752},
+    "24": {"x": 24, "qx": 0.000966, "px": 0.999034, "lx": 9926318.527113067, "dx": 9588.823697191223, "Dx": 3077832.8425019, "Cx": 2831.6062151017477, "Nx": 57629556.92699038, "Sx": 946811463.2621155, "Mx": 333568.22693092766, "Rx": 12543296.77165149},
+    "25": {"x": 25, "qx": 0.001041, "px": 0.998959, "lx": 9916729.703415876, "dx": 10323.315621255928, "Dx": 2928437.7675962313, "Cx": 2903.3368724454067, "Nx": 54551724.08448848, "Sx": 889181906.3351251, "Mx": 330736.62071582593, "Rx": 12209728.544720562},
+    "26": {"x": 26, "qx": 0.001121, "px": 0.998879, "lx": 9906406.387794621, "dx": 11105.08156071777, "Dx": 2786085.013219204, "Cx": 2974.4774283987877, "Nx": 51623286.31689225, "Sx": 834630182.2506366, "Mx": 327833.2838433805, "Rx": 11878991.924004735},
+    "27": {"x": 27, "qx": 0.001207, "px": 0.998793, "lx": 9895301.306233903, "dx": 11943.628676624321, "Dx": 2650439.8208756046, "Cx": 3046.7436798065282, "Nx": 48837201.303673044, "Sx": 783006895.9337443, "Mx": 324858.8064149817, "Rx": 11551158.640161354},
+    "28": {"x": 28, "qx": 0.0013, "px": 0.9987, "lx": 9883357.67755728, "dx": 12848.364980824465, "Dx": 2521181.657154103, "Cx": 3121.463004095556, "Nx": 46186761.48279744, "Sx": 734169694.6300713, "Mx": 321812.0627351752, "Rx": 11226299.833746372},
+    "29": {"x": 29, "qx": 0.0014, "px": 0.9986, "lx": 9870509.312576456, "dx": 13818.713037607038, "Dx": 2398003.9247617163, "Cx": 3197.338566348955, "Nx": 43665579.82564333, "Sx": 687982933.1472739, "Mx": 318690.59973107965, "Rx": 10904487.771011196},
+    "30": {"x": 30, "qx": 0.001508, "px": 0.998492, "lx": 9856690.59953885, "dx": 14863.889424104585, "Dx": 2280615.923111476, "Cx": 3275.3988686210537, "Nx": 41267575.90088161, "Sx": 644317353.3216306, "Mx": 315493.2611647307, "Rx": 10585797.171280116},
+    "31": {"x": 31, "qx": 0.001624, "px": 0.998376, "lx": 9841826.710114745, "dx": 15983.126577226347, "Dx": 2168739.7659994517, "Cx": 3354.3175047458185, "Nx": 38986959.977770135, "Sx": 603049777.420749, "Mx": 312217.86229610967, "Rx": 10270303.910115385},
+    "32": {"x": 32, "qx": 0.001749, "px": 0.998251, "lx": 9825843.583537519, "dx": 17185.40042760712, "Dx": 2062112.1263042556, "Cx": 3434.8896275296597, "Nx": 36818220.21177068, "Sx": 564062817.4429789, "Mx": 308863.5447913639, "Rx": 9958086.047819275},
+    "33": {"x": 33, "qx": 0.001884, "px": 0.998116, "lx": 9808658.183109911, "dx": 18479.51201697907, "Dx": 1960481.4211384277, "Cx": 3517.6638070712356, "Nx": 34756108.08546643, "Sx": 527244597.2312082, "Mx": 305428.6551638342, "Rx": 9649222.503027912},
+    "34": {"x": 34, "qx": 0.002029, "px": 0.997971, "lx": 9790178.671092933, "dx": 19864.27252364756, "Dx": 1863607.4991819076, "Cx": 3601.1996341334193, "Nx": 32795626.664328, "Sx": 492488489.14574176, "Mx": 301910.991356763, "Rx": 9343793.847864078},
+    "35": {"x": 35, "qx": 0.002186, "px": 0.997814, "lx": 9770314.398569286, "dx": 21357.90727527246, "Dx": 1771263.0853010167, "Cx": 3687.601051874307, "Nx": 30932019.165146094, "Sx": 459692862.4814138, "Mx": 298309.79172262957, "Rx": 9041882.856507316},
+    "36": {"x": 36, "qx": 0.002354, "px": 0.997646, "lx": 9748956.491294013, "dx": 22949.04358050611, "Dx": 1683229.6230443318, "Cx": 3773.640507282245, "Nx": 29160756.07984508, "Sx": 428760843.31626767, "Mx": 294622.1906707553, "Rx": 8743573.064784687},
+    "37": {"x": 37, "qx": 0.002535, "px": 0.997465, "lx": 9726007.447713507, "dx": 24655.42887995374, "Dx": 1599302.19096351, "Cx": 3861.172432469045, "Nx": 27477526.456800748, "Sx": 399600087.2364226, "Mx": 290848.55016347306, "Rx": 8448950.874113932},
+    "38": {"x": 38, "qx": 0.00273, "px": 0.99727, "lx": 9701352.018833553, "dx": 26484.691011415598, "Dx": 1519283.7713423022, "Cx": 3950.137805489985, "Nx": 25878224.265837237, "Sx": 372122560.77962184, "Mx": 286987.37773100403, "Rx": 8158102.323950459},
+    "39": {"x": 39, "qx": 0.00294, "px": 0.99706, "lx": 9674867.327822138, "dx": 28444.109943797084, "Dx": 1442986.7872824168, "Cx": 4040.3630043907674, "Nx": 24358940.494494934, "Sx": 346244336.5137846, "Mx": 283037.23992551403, "Rx": 7871114.946219455},
+    "40": {"x": 40, "qx": 0.003166, "px": 0.996834, "lx": 9646423.21787834, "dx": 30540.575907802824, "Dx": 1370232.7677407681, "Cx": 4131.578040635496, "Nx": 22915953.707212515, "Sx": 321885396.0192897, "Mx": 278996.87692112324, "Rx": 7588077.7062939415},
+    "41": {"x": 41, "qx": 0.00341, "px": 0.99659, "lx": 9615882.641970538, "dx": 32790.159809119534, "Dx": 1300852.0102839053, "Cx": 4224.671766731541, "Nx": 21545720.939471748, "Sx": 298969442.31207716, "Mx": 274865.29888048774, "Rx": 7309080.829372819},
+    "42": {"x": 42, "qx": 0.003672, "px": 0.996328, "lx": 9583092.482161418, "dx": 35189.115594496725, "Dx": 1234682.0046941305, "Cx": 4317.8593535589025, "Nx": 20244868.92918784, "Sx": 277423721.37260544, "Mx": 270640.6271137562, "Rx": 7034215.530492331},
+    "43": {"x": 43, "qx": 0.003954, "px": 0.996046, "lx": 9547903.36656692, "dx": 37752.40991140561, "Dx": 1171569.7641646606, "Cx": 4411.79699762578, "Nx": 19010186.92449371, "Sx": 257178852.44341758, "Mx": 266322.7677601973, "Rx": 6763574.903378575},
+    "44": {"x": 44, "qx": 0.004258, "px": 0.995742, "lx": 9510150.956655515, "dx": 40494.22277343918, "Dx": 1111368.9307782415, "Cx": 4506.865625955954, "Nx": 17838617.16032905, "Sx": 238168665.51892388, "Mx": 261910.97076257152, "Rx": 6497252.1356183775},
+    "45": {"x": 45, "qx": 0.004585, "px": 0.995415, "lx": 9469656.733882077, "dx": 43418.37612484932, "Dx": 1053939.7351152264, "Cx": 4602.203510003154, "Nx": 16727248.22955081, "Sx": 220330048.35859483, "Mx": 257404.10513661557, "Rx": 6235341.164855806},
+    "46": {"x": 46, "qx": 0.004938, "px": 0.995062, "lx": 9426238.357757227, "dx": 46546.76501060519, "Dx": 999149.9251711648, "Cx": 4698.859362376392, "Nx": 15673308.494435584, "Sx": 203602800.12904403, "Mx": 252801.9016266124, "Rx": 5977937.059719191},
+    "47": {"x": 47, "qx": 0.005317, "px": 0.994683, "lx": 9379691.592746623, "dx": 49871.82019863379, "Dx": 946872.4979434948, "Cx": 4794.781972919583, "Nx": 14674158.56926442, "Sx": 187929491.63460845, "Mx": 248103.04226423602, "Rx": 5725135.158092579},
+    "48": {"x": 48, "qx": 0.005725, "px": 0.994275, "lx": 9329819.772547988, "dx": 53413.21819783723, "Dx": 896988.5494018373, "Cx": 4890.723281262399, "Nx": 13727286.071320925, "Sx": 173255333.06534404, "Mx": 243308.26029131643, "Rx": 5477032.115828343},
+    "49": {"x": 49, "qx": 0.006164, "px": 0.993836, "lx": 9276406.55435015, "dx": 57179.77000101433, "Dx": 849384.0856728683, "Cx": 4986.289051511962, "Nx": 12830297.521919088, "Sx": 159528046.9940231, "Mx": 238417.53701005402, "Rx": 5233723.855537026},
+    "50": {"x": 50, "qx": 0.006637, "px": 0.993363, "lx": 9219226.784349136, "dx": 61188.00816772522, "Dx": 803950.9353988386, "Cx": 5081.735579278184, "Nx": 11980913.43624622, "Sx": 146697749.472104, "Mx": 233431.24795854205, "Rx": 4995306.318526972},
+    "51": {"x": 51, "qx": 0.007145, "px": 0.992855, "lx": 9158038.776181411, "dx": 65434.18705581618, "Dx": 760585.8219434253, "Cx": 5175.605426462642, "Nx": 11176962.50084738, "Sx": 134716836.0358578, "Mx": 228349.51237926388, "Rx": 4761875.07056843},
+    "52": {"x": 52, "qx": 0.007693, "px": 0.992307, "lx": 9092604.589125596, "dx": 69949.40710414322, "Dx": 719191.8440434663, "Cx": 5269.278910691796, "Nx": 10416376.678903956, "Sx": 123539873.53501041, "Mx": 223173.90695280125, "Rx": 4533525.558189167},
+    "53": {"x": 53, "qx": 0.008282, "px": 0.991718, "lx": 9022655.182021454, "dx": 74725.63021750168, "Dx": 679675.334464038, "Cx": 5361.020114315393, "Nx": 9697184.834860489, "Sx": 113123496.85610646, "Mx": 217904.62804210946, "Rx": 4310351.651236366},
+    "54": {"x": 54, "qx": 0.008915, "px": 0.991085, "lx": 8947929.551803952, "dx": 79770.79195433222, "Dx": 641948.8222323874, "Cx": 5450.451190668317, "Nx": 9017509.500396451, "Sx": 103426312.02124597, "Mx": 212543.60792779407, "Rx": 4092447.023194256},
+    "55": {"x": 55, "qx": 0.009597, "px": 0.990403, "lx": 8868158.75984962, "dx": 85107.7196182768, "Dx": 605929.3795068435, "Cx": 5538.194528692548, "Nx": 8375560.678164063, "Sx": 94408802.52084953, "Mx": 207093.15673712577, "Rx": 3879903.4152664617},
+    "56": {"x": 56, "qx": 0.01033, "px": 0.98967, "lx": 8783051.040231343, "dx": 90728.91724558978, "Dx": 571537.4050016345, "Cx": 5622.839422539891, "Nx": 7769631.29865722, "Sx": 86033241.84268546, "Mx": 201554.96220843322, "Rx": 3672810.2585293357},
+    "57": {"x": 57, "qx": 0.011119, "px": 0.988881, "lx": 8692322.122985754, "dx": 96649.92968547861, "Dx": 538698.498674255, "Cx": 5704.560577865754, "Nx": 7198093.893655585, "Sx": 78263610.54402824, "Mx": 195932.12278589333, "Rx": 3471255.2963209026},
+    "58": {"x": 58, "qx": 0.011967, "px": 0.988033, "lx": 8595672.193300275, "dx": 102864.4091372244, "Dx": 507341.62863571034, "Cx": 5782.245018936711, "Nx": 6659395.39498133, "Sx": 71065516.65037265, "Mx": 190227.56220802758, "Rx": 3275323.1735350094},
+    "59": {"x": 59, "qx": 0.012879, "px": 0.987121, "lx": 8492807.78416305, "dx": 109378.87145223592, "Dx": 477400.25844364456, "Cx": 5855.655169995903, "Nx": 6152053.76634562, "Sx": 64406121.25539132, "Mx": 184445.31718909086, "Rx": 3085095.611326982},
+    "60": {"x": 60, "qx": 0.01386, "px": 0.98614, "lx": 8383428.912710815, "dx": 116194.3247301719, "Dx": 448811.25763347506, "Cx": 5924.30860076187, "Nx": 5674653.507901976, "Sx": 58254067.4890457, "Mx": 178589.66201909495, "Rx": 2900650.294137891},
+    "61": {"x": 61, "qx": 0.014914, "px": 0.985086, "lx": 8267234.587980643, "dx": 123297.53664514331, "Dx": 421514.98438350006, "Cx": 5987.11854961478, "Nx": 5225842.250268501, "Sx": 52579413.98114373, "Mx": 172665.35341833308, "Rx": 2722060.632118796},
+    "62": {"x": 62, "qx": 0.016048, "px": 0.983952, "lx": 8143937.0513355, "dx": 130693.90179983209, "Dx": 395455.7237203852, "Cx": 6044.069956442611, "Nx": 4804327.265885001, "Sx": 47353571.730875224, "Mx": 166678.2348687183, "Rx": 2549395.278700463},
+    "63": {"x": 63, "qx": 0.017265, "px": 0.982735, "lx": 8013243.149535668, "dx": 138348.6429767333, "Dx": 370580.42882487667, "Cx": 6093.401051106187, "Nx": 4408871.542164615, "Sx": 42549244.46499022, "Mx": 160634.1649122757, "Rx": 2382717.0438317447},
+    "64": {"x": 64, "qx": 0.018574, "px": 0.981426, "lx": 7874894.506558935, "dx": 146268.29056482567, "Dx": 346840.34068687167, "Cx": 6135.440464683765, "Nx": 4038291.113339739, "Sx": 38140372.922825605, "Mx": 154540.76386116951, "Rx": 2222082.878919469},
+    "65": {"x": 65, "qx": 0.01998, "px": 0.98002, "lx": 7728626.215994109, "dx": 154417.95179556232, "Dx": 324188.693522813, "Cx": 6168.847711034099, "Nx": 3691450.7726528673, "Sx": 34102081.80948587, "Mx": 148405.32339648576, "Rx": 2067542.1150582996},
+    "66": {"x": 66, "qx": 0.02149, "px": 0.97851, "lx": 7574208.264198547, "dx": 162769.73559762677, "Dx": 302582.28897735925, "Cx": 6192.850847736618, "Nx": 3367262.0791300545, "Sx": 30410631.036833003, "Mx": 142236.47568545167, "Rx": 1919136.7916618139},
+    "67": {"x": 67, "qx": 0.023111, "px": 0.976889, "lx": 7411438.52860092, "dx": 171285.75583449585, "Dx": 281980.75770212925, "Cx": 6206.530753575151, "Nx": 3064679.790152695, "Sx": 27043368.95770295, "Mx": 136043.62483771506, "Rx": 1776900.3159763622},
+    "68": {"x": 68, "qx": 0.024851, "px": 0.975149, "lx": 7240152.772766424, "dx": 179925.03655601843, "Dx": 262346.57181988127, "Cx": 6209.118720281781, "Nx": 2782699.0324505656, "Sx": 23978689.167550255, "Mx": 129837.0940841399, "Rx": 1640856.691138647},
+    "69": {"x": 69, "qx": 0.02672, "px": 0.97328, "lx": 7060227.736210406, "dx": 188649.28511154203, "Dx": 243644.75920341467, "Cx": 6200.1790151573705, "Nx": 2520352.460630684, "Sx": 21195990.13509969, "Mx": 123627.97536385812, "Rx": 1511019.5970545071},
+    "70": {"x": 70, "qx": 0.028724, "px": 0.971276, "lx": 6871578.451098864, "dx": 197379.21942936376, "Dx": 225842.44879761848, "Cx": 6178.189046916947, "Nx": 2276707.7014272697, "Sx": 18675637.674469005, "Mx": 117427.79634870075, "Rx": 1387391.621690649},
+    "71": {"x": 71, "qx": 0.030874, "px": 0.969126, "lx": 6674199.2316695005, "dx": 206059.22707856414, "Dx": 208909.85742700545, "Cx": 6142.745655429871, "Nx": 2050865.2526296515, "Sx": 16398929.973041736, "Mx": 111249.6073017838, "Rx": 1269963.8253419483},
+    "72": {"x": 72, "qx": 0.03318, "px": 0.96682, "lx": 6468140.004590937, "dx": 214612.88535232728, "Dx": 192819.02332267055, "Cx": 6093.081136996389, "Nx": 1841955.395202646, "Sx": 14348064.720412085, "Mx": 105106.86164635394, "Rx": 1158714.2180401646},
+    "73": {"x": 73, "qx": 0.035651, "px": 0.964349, "lx": 6253527.119238609, "dx": 222944.4953279757, "Dx": 177544.08393221363, "Cx": 6028.213463111761, "Nx": 1649136.3718799755, "Sx": 12506109.325209439, "Mx": 99013.78050935754, "Rx": 1053607.3563938106},
+    "74": {"x": 74, "qx": 0.0383, "px": 0.9617, "lx": 6030582.623910634, "dx": 230971.31449577727, "Dx": 163061.39028185362, "Cx": 5947.858331233327, "Nx": 1471592.2879477618, "Sx": 10856972.953329463, "Mx": 92985.56704624578, "Rx": 954593.5758844531},
+    "75": {"x": 75, "qx": 0.041136, "px": 0.958864, "lx": 5799611.309414856, "dx": 238572.8108240895, "Dx": 149348.70384196058, "Cx": 5851.055505945608, "Nx": 1308530.897665908, "Sx": 9385380.665381702, "Mx": 87037.70871501246, "Rx": 861608.0088382073},
+    "76": {"x": 76, "qx": 0.044174, "px": 0.955826, "lx": 5561038.498590766, "dx": 245653.31463674852, "Dx": 136385.80529592157, "Cx": 5737.81577442099, "Nx": 1159182.1938239476, "Sx": 8076849.767715793, "Mx": 81186.65320906685, "Rx": 774570.3001231949},
+    "77": {"x": 77, "qx": 0.047424, "px": 0.952576, "lx": 5315385.183954017, "dx": 252076.8269638353, "Dx": 124153.42736455191, "Cx": 5607.478227939533, "Nx": 1022796.388528026, "Sx": 6917667.5738918455, "Mx": 75448.83743464586, "Rx": 693383.6469141281},
+    "78": {"x": 78, "qx": 0.050902, "px": 0.949098, "lx": 5063308.356990182, "dx": 257732.52198751425, "Dx": 112633.88116687181, "Cx": 5460.276018243913, "Nx": 898642.961163474, "Sx": 5894871.18536382, "Mx": 69841.35920670633, "Rx": 617934.8094794822},
+    "79": {"x": 79, "qx": 0.054619, "px": 0.945381, "lx": 4805575.835002667, "dx": 262475.7465320107, "Dx": 101810.08699782446, "Cx": 5295.966801651594, "Nx": 786009.0799966021, "Sx": 4996228.224200346, "Mx": 64381.08318846242, "Rx": 548093.450272776},
+    "80": {"x": 80, "qx": 0.058592, "px": 0.941408, "lx": 4543100.088470656, "dx": 266189.3203836727, "Dx": 91666.02081532408, "Cx": 5115.138563439494, "Nx": 684198.9929987777, "Sx": 4210219.144203744, "Mx": 59085.11638681083, "Rx": 483712.3670843135},
+    "81": {"x": 81, "qx": 0.062834, "px": 0.9371659999999999, "lx": 4276910.768086984, "dx": 268735.4112019775, "Dx": 82185.83364163105, "Cx": 4918.156829560234, "Nx": 592532.9721834536, "Sx": 3526020.151204966, "Mx": 53969.97782337133, "Rx": 424627.25069750263},
+    "82": {"x": 82, "qx": 0.067362, "px": 0.932638, "lx": 4008175.356885006, "dx": 269998.7083904878, "Dx": 73354.06568627886, "Cx": 4705.977688342016, "Nx": 510347.13854182255, "Sx": 2933487.179021512, "Mx": 49051.820993811096, "Rx": 370657.27287413133},
+    "83": {"x": 83, "qx": 0.07219, "px": 0.92781, "lx": 3738176.6484945184, "dx": 269858.9722548193, "Dx": 65155.037250971174, "Cx": 4479.563942045343, "Nx": 436993.0728555437, "Sx": 2423140.04047969, "Mx": 44345.843305469076, "Rx": 321605.45188032027},
+    "84": {"x": 84, "qx": 0.077337, "px": 0.922663, "lx": 3468317.676239699, "dx": 268229.2841273496, "Dx": 57572.85248745102, "Cx": 4240.487326497142, "Nx": 371838.0356045725, "Sx": 1986146.967624146, "Mx": 39866.27936342373, "Rx": 277259.6085748512},
+    "85": {"x": 85, "qx": 0.082817, "px": 0.917183, "lx": 3200088.3921123496, "dx": 265021.72036956844, "Dx": 50590.80075678953, "Cx": 3990.265091690513, "Nx": 314265.18311712146, "Sx": 1614308.9320195736, "Mx": 35625.79203692659, "Rx": 237393.32921142742},
+    "86": {"x": 86, "qx": 0.088649, "px": 0.911351, "lx": 2935066.671742781, "dx": 260190.72538332583, "Dx": 44191.44991477571, "Cx": 3730.9788985666214, "Nx": 263674.38236033195, "Sx": 1300043.7489024522, "Mx": 31635.52694523608, "Rx": 201767.53717450082},
+    "87": {"x": 87, "qx": 0.09485, "px": 0.90515, "lx": 2674875.946359455, "dx": 253711.98351219433, "Dx": 38356.11625836262, "Cx": 3464.8358353387566, "Nx": 219482.93244555625, "Sx": 1036369.3665421203, "Mx": 27904.54804666946, "Rx": 170132.01022926474},
+    "88": {"x": 88, "qx": 0.101436, "px": 0.898564, "lx": 2421163.9628472608, "dx": 245593.18773537473, "Dx": 33064.798696435166, "Cx": 3194.2484957824736, "Nx": 181126.81618719362, "Sx": 816886.4340965641, "Mx": 24439.712211330705, "Rx": 142227.46218259528},
+    "89": {"x": 89, "qx": 0.108424, "px": 0.891576, "lx": 2175570.775111886, "dx": 235884.08572073118, "Dx": 28296.035977012925, "Cx": 2921.8756235920473, "Nx": 148062.01749075844, "Sx": 635759.6179093705, "Mx": 21245.46371554823, "Rx": 117787.74997126458},
+    "90": {"x": 90, "qx": 0.115832, "px": 0.884168, "lx": 1939686.689391155, "dx": 224677.78860555627, "Dx": 24026.730068801215, "Cx": 2650.5373307898876, "Nx": 119765.98151374552, "Sx": 487697.60041861207, "Mx": 18323.588091956182, "Rx": 96542.28625571635},
+    "91": {"x": 91, "qx": 0.123677, "px": 0.876323, "lx": 1715008.9007855987, "dx": 212107.15582246048, "Dx": 20232.062734735075, "Cx": 2383.086497946504, "Nx": 95739.2514449443, "Sx": 367931.61890486657, "Mx": 15673.050761166296, "Rx": 78218.69816376017},
+    "92": {"x": 92, "qx": 0.131973, "px": 0.868027, "lx": 1502901.7449631381, "dx": 198342.45198802024, "Dx": 16885.54467799166, "Cx": 2122.319988370089, "Nx": 75507.18871020922, "Sx": 272192.3674599223, "Mx": 13289.964263219792, "Rx": 62545.64740259388},
+    "93": {"x": 93, "qx": 0.140737, "px": 0.859263, "lx": 1304559.292975118, "dx": 183599.76121543918, "Dx": 13959.15113352673, "Cx": 1871.0181457896679, "Nx": 58621.64403221756, "Sx": 196685.17874971306, "Mx": 11167.644274849703, "Rx": 49255.68313937409},
+    "94": {"x": 94, "qx": 0.149983, "px": 0.850017, "lx": 1120959.5317596789, "dx": 168124.87345191193, "Dx": 11423.411505188169, "Cx": 1631.7309788406071, "Nx": 44662.492898690834, "Sx": 138063.5347174955, "Mx": 9296.626129060034, "Rx": 38088.03886452438},
+    "95": {"x": 95, "qx": 0.159723, "px": 0.8402769999999999, "lx": 952834.658307767, "dx": 152189.61012889148, "Dx": 9247.708549910032, "Cx": 1406.7350025878857, "Nx": 33239.08139350267, "Sx": 93401.04181880466, "Mx": 7664.895150219427, "Rx": 28791.412735464342},
+    "96": {"x": 96, "qx": 0.16997, "px": 0.83003, "lx": 800645.0481788755, "dx": 136085.63883896347, "Dx": 7400.606473516906, "Cx": 1197.9819831463508, "Nx": 23991.372843592635, "Sx": 60161.96042530199, "Mx": 6258.160147631541, "Rx": 21126.517585244917},
+    "97": {"x": 97, "qx": 0.180733, "px": 0.819267, "lx": 664559.409339912, "dx": 120107.81572823031, "Dx": 5850.2146582983205, "Cx": 1006.9779484173622, "Nx": 16590.76637007573, "Sx": 36170.58758170936, "Mx": 5060.17816448519, "Rx": 14868.357437613377},
+    "98": {"x": 98, "qx": 0.19202, "px": 0.80798, "lx": 544451.5936116817, "dx": 104545.59500531512, "Dx": 4564.6550594858, "Cx": 834.7667281166316, "Nx": 10740.551711777409, "Sx": 19579.821211633636, "Mx": 4053.2002160678276, "Rx": 9808.179273128186},
+    "99": {"x": 99, "qx": 0.203837, "px": 0.796163, "lx": 439905.99860636663, "dx": 89669.11903792595, "Dx": 3512.5238047269872, "Cx": 681.8879188420333, "Nx": 6175.896652291609, "Sx": 8839.26949985623, "Mx": 3218.433487951196, "Rx": 5754.979057060359},
+    "100": {"x": 100, "qx": 1.0, "px": 0.0, "lx": 350236.87956844067, "dx": 350236.87956844067, "Dx": 2663.372847564621, "Cx": 2536.545569109163, "Nx": 2663.372847564621, "Sx": 2663.372847564621, "Mx": 2536.545569109163, "Rx": 2536.545569109163},
+    "101": {"x": 101, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "102": {"x": 102, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "103": {"x": 103, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "104": {"x": 104, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "105": {"x": 105, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "106": {"x": 106, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "107": {"x": 107, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "108": {"x": 108, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "109": {"x": 109, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "110": {"x": 110, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "111": {"x": 111, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "112": {"x": 112, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "113": {"x": 113, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "114": {"x": 114, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "115": {"x": 115, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "116": {"x": 116, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "117": {"x": 117, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "118": {"x": 118, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "119": {"x": 119, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "120": {"x": 120, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "121": {"x": 121, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "122": {"x": 122, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "123": {"x": 123, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "124": {"x": 124, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "125": {"x": 125, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "126": {"x": 126, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "127": {"x": 127, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "128": {"x": 128, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "129": {"x": 129, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "130": {"x": 130, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "131": {"x": 131, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "132": {"x": 132, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "133": {"x": 133, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "134": {"x": 134, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "135": {"x": 135, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "136": {"x": 136, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "137": {"x": 137, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "138": {"x": 138, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "139": {"x": 139, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "140": {"x": 140, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "141": {"x": 141, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "142": {"x": 142, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "143": {"x": 143, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "144": {"x": 144, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "145": {"x": 145, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "146": {"x": 146, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "147": {"x": 147, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "148": {"x": 148, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "149": {"x": 149, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0},
+    "150": {"x": 150, "qx": 1.0, "px": 0.0, "lx": 0.0, "dx": 0.0, "Dx": 0.0, "Cx": 0.0, "Nx": 0.0, "Sx": 0.0, "Mx": 0.0, "Rx": 0.0}
+  }
+};
+
+    // 2. ESTADO DE LA APLICACIÓN
+    const estadoApp = {
+      nombre: '',
+      edadReal: 30,
+      sexo: 'M',        // 'M' | 'F'
+      fuma: false,      // true | false
+      edadActuarial: 28,
+      truncadaA14: false,
+      categoria: 'seguro', // 'seguro' | 'anualidad'
+      contadorFolios: 1
+    };
+
+    const OMEGA = TABLA_CONMUTADOS.metadata.omega; // 100
+    const MONTO_MAXIMO = 1e12; // tope de captura para SA y R (un billón de pesos)
+
+    // 3. FUNCIONES AUXILIARES ACTUARIALES Y DE FORMATO
+    function calcularEdadActuarial(edadReal, sexo, fuma) {
+      const descSexo = (sexo === 'F') ? 2 : 0;
+      const descFuma = (!fuma) ? 2 : 0;
+      const sinTruncar = edadReal - descSexo - descFuma;
+      const x = Math.max(14, sinTruncar);
+      return {
+        x,
+        descSexo,
+        descFuma,
+        sinTruncar,
+        truncada: sinTruncar < 14
+      };
+    }
+
+    /**
+     * Obtiene de forma segura un valor conmutado para la edad `edad`.
+     * Si la edad supera omega (100), devuelve 0.0 para evitar NaN o undefined.
+     */
+    function getConmutado(edad, campo) {
+      const edadInt = Math.round(Number(edad));
+      if (isNaN(edadInt) || edadInt < 12) return 0.0;
+      if (edadInt > OMEGA) return 0.0;
+      const fila = TABLA_CONMUTADOS.valores[String(edadInt)];
+      if (!fila || typeof fila[campo] !== 'number') return 0.0;
+      return fila[campo];
+    }
+
+    function fmtMoneda(valor) {
+      if (!isFinite(valor)) return '$0.00 MXN';
+      return '$' + valor.toLocaleString('es-MX', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }) + ' MXN';
+    }
+
+    function fmtNum(valor, decimales = 4) {
+      if (!isFinite(valor)) return '0';
+      return valor.toLocaleString('es-MX', {
+        minimumFractionDigits: decimales,
+        maximumFractionDigits: decimales
+      });
+    }
+
+    // 4. ELEMENTOS DEL DOM
+    const seccionPaso1 = document.getElementById('seccionPaso1');
+    const seccionPaso2 = document.getElementById('seccionPaso2');
+    const seccionPaso3 = document.getElementById('seccionPaso3');
+
+    const stepIndicator1 = document.getElementById('stepIndicator1');
+    const stepIndicator2 = document.getElementById('stepIndicator2');
+    const stepIndicator3 = document.getElementById('stepIndicator3');
+
+    const formPaso1 = document.getElementById('formPaso1');
+    const inputNombre = document.getElementById('nombreAsegurado');
+    const inputEdadReal = document.getElementById('edadReal');
+    const alertaPaso1 = document.getElementById('alertaPaso1');
+    const mensajeAlertaPaso1 = document.getElementById('mensajeAlertaPaso1');
+    const desgloseEdadPreview = document.getElementById('desgloseEdadPreview');
+    const valorEdadActuarialPreview = document.getElementById('valorEdadActuarialPreview');
+
+    const formPaso2 = document.getElementById('formPaso2');
+    const panelConfigSeguro = document.getElementById('panelConfigSeguro');
+    const panelConfigAnualidad = document.getElementById('panelConfigAnualidad');
+
+    const selectTipoSeguro = document.getElementById('tipoSeguro');
+    const selectModalidadPrima = document.getElementById('modalidadPrima');
+    const grupoSegDiferimiento = document.getElementById('grupoSegDiferimiento');
+    const grupoSegTemporalidad = document.getElementById('grupoSegTemporalidad');
+    const grupoSegPagosH = document.getElementById('grupoSegPagosH');
+    const grupoCriterioPNNDiferido = document.getElementById('grupoCriterioPNNDiferido');
+    const selectCriterioPNNDiferido = document.getElementById('criterioPNNDiferido');
+
+    const inputSegM = document.getElementById('segDiferimientoM');
+    const inputSegN = document.getElementById('segTemporalidadN');
+    const inputSegH = document.getElementById('segPagosH');
+    const inputSumaAsegurada = document.getElementById('sumaAsegurada');
+
+    const selectTipoAnualidad = document.getElementById('tipoAnualidad');
+    const grupoAnuDiferimiento = document.getElementById('grupoAnuDiferimiento');
+    const grupoAnuTemporalidad = document.getElementById('grupoAnuTemporalidad');
+    const inputAnuM = document.getElementById('anuDiferimientoM');
+    const inputAnuN = document.getElementById('anuTemporalidadN');
+    const inputMontoRenta = document.getElementById('montoRenta');
+
+    const alertaPaso2 = document.getElementById('alertaPaso2');
+    const mensajeAlertaPaso2 = document.getElementById('mensajeAlertaPaso2');
+    const textoFormulaPreview = document.getElementById('textoFormulaPreview');
+    const etiquetaEdadesPreview = document.getElementById('etiquetaEdadesPreview');
+
+    // 5. SINCRONIZACIÓN VISUAL DE TARJETAS RADIO
+    document.querySelectorAll('.choice-card input[type="radio"]').forEach((radio) => {
+      radio.addEventListener('change', () => {
+        const groupName = radio.name;
+        document.querySelectorAll(`input[name="${groupName}"]`).forEach((r) => {
+          const card = r.closest('.choice-card');
+          if (card) {
+            card.classList.toggle('selected', r.checked);
+          }
+        });
+        if (groupName === 'sexo' || groupName === 'fuma' || groupName === 'categoriaProducto') {
+          actualizarPreviewEdadPaso1();
+        }
+        if (groupName === 'momentoAnualidad') {
+          actualizarVisibilidadPaso2();
+        }
+      });
+    });
+
+    // Botones rápidos de montos (Suma Asegurada y Renta)
+    document.querySelectorAll('.btn-chip').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        const val = btn.getAttribute('data-val');
+        const input = document.getElementById(targetId);
+        if (input) {
+          input.value = val;
+          ocultarAlertaPaso2();
+        }
+      });
+    });
+
+    // 6. LÓGICA DEL PASO 1: PREVIEW Y VALIDACIÓN DE EDAD (14 A 75)
+    function obtenerSeleccionesPaso1() {
+      const sexoRadio = document.querySelector('input[name="sexo"]:checked');
+      const fumaRadio = document.querySelector('input[name="fuma"]:checked');
+      const catRadio = document.querySelector('input[name="categoriaProducto"]:checked');
+      return {
+        nombre: inputNombre.value.trim(),
+        edadReal: Number(inputEdadReal.value),
+        sexo: sexoRadio ? sexoRadio.value : 'M',
+        fuma: fumaRadio ? (fumaRadio.value === 'si') : false,
+        categoria: catRadio ? catRadio.value : 'seguro'
+      };
+    }
+
+    function mostrarAlertaPaso1(msg) {
+      mensajeAlertaPaso1.innerHTML = msg;
+      alertaPaso1.classList.remove('hidden');
+    }
+
+    function ocultarAlertaPaso1() {
+      alertaPaso1.classList.add('hidden');
+      inputEdadReal.classList.remove('input-error');
+      inputNombre.classList.remove('input-error');
+    }
+
+    function actualizarPreviewEdadPaso1() {
+      const sel = obtenerSeleccionesPaso1();
+      const edadValida = Number.isInteger(sel.edadReal) && sel.edadReal >= 14 && sel.edadReal <= 75;
+
+      if (!edadValida && inputEdadReal.value !== '') {
+        inputEdadReal.classList.add('input-error');
+        mostrarAlertaPaso1(
+          `<strong>Edad fuera del rango permitido:</strong> La edad real ingresada (<strong>${inputEdadReal.value}</strong>) debe ser un número entero entre <strong>14 y 75 años</strong> conforme a las reglas técnicas del cotizador.`
+        );
+      } else {
+        ocultarAlertaPaso1();
+      }
+
+      const edadBase = isNaN(sel.edadReal) ? 14 : Math.min(75, Math.max(14, Math.round(sel.edadReal)));
+      const infoEdad = calcularEdadActuarial(edadBase, sel.sexo, sel.fuma);
+
+      let htmlPills = `<span class="age-pill">Edad Real: ${edadBase}</span>`;
+      if (infoEdad.descSexo > 0) {
+        htmlPills += `<span>−</span><span class="age-pill discount">Mujer: 2 años</span>`;
+      } else {
+        htmlPills += `<span>−</span><span class="age-pill">Hombre: 0 años</span>`;
+      }
+      if (infoEdad.descFuma > 0) {
+        htmlPills += `<span>−</span><span class="age-pill discount">No Fumador(a): 2 años</span>`;
+      } else {
+        htmlPills += `<span>−</span><span class="age-pill">Fumador(a): 0 años</span>`;
+      }
+
+      if (infoEdad.truncada) {
+        htmlPills += `<span>= ${infoEdad.sinTruncar} →</span><span class="age-pill truncated">Truncada al mínimo: 14 años</span>`;
+      }
+
+      desgloseEdadPreview.innerHTML = htmlPills;
+      valorEdadActuarialPreview.textContent = `x = ${infoEdad.x} años`;
+    }
+
+    inputEdadReal.addEventListener('input', actualizarPreviewEdadPaso1);
+    inputNombre.addEventListener('input', () => {
+      if (inputNombre.value.trim() !== '') {
+        inputNombre.classList.remove('input-error');
+        actualizarPreviewEdadPaso1(); // retira la alerta del nombre (o deja la de edad si aplica)
+      }
+    });
+
+    function validarPaso1() {
+      const sel = obtenerSeleccionesPaso1();
+      if (!sel.nombre) {
+        inputNombre.classList.add('input-error');
+        mostrarAlertaPaso1('Por favor ingrese el <strong>nombre completo del asegurado</strong> para continuar.');
+        inputNombre.focus();
+        return false;
+      }
+      if (
+        inputEdadReal.value.trim() === '' ||
+        isNaN(sel.edadReal) ||
+        !Number.isInteger(sel.edadReal) ||
+        sel.edadReal < 14 ||
+        sel.edadReal > 75
+      ) {
+        inputEdadReal.classList.add('input-error');
+        mostrarAlertaPaso1(
+          '<strong>Validación de Edad:</strong> La edad real del asegurado debe ser un número entero entre <strong>14 y 75 años</strong>.'
+        );
+        inputEdadReal.focus();
+        return false;
+      }
+
+      const infoEdad = calcularEdadActuarial(sel.edadReal, sel.sexo, sel.fuma);
+      estadoApp.nombre = sel.nombre;
+      estadoApp.edadReal = sel.edadReal;
+      estadoApp.sexo = sel.sexo;
+      estadoApp.fuma = sel.fuma;
+      estadoApp.edadActuarial = infoEdad.x;
+      estadoApp.truncadaA14 = infoEdad.truncada;
+      estadoApp.categoria = sel.categoria;
+
+      ocultarAlertaPaso1();
+      return true;
+    }
+
+    formPaso1.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (validarPaso1()) {
+        irAPaso(2);
+      }
+    });
+
+    // 7. NAVEGACIÓN ENTRE PASOS
+    let pasoActual = 1;
+    const stepperNav = document.getElementById('stepperNav');
+    const prefiereMenosMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    function irAPaso(numPaso) {
+      const pasoAnterior = pasoActual;
+      // La dirección decide de qué lado entra la tarjeta (adelante = derecha, atrás = izquierda)
+      document.documentElement.dataset.dir = numPaso < pasoAnterior ? 'back' : 'forward';
+
+      seccionPaso1.classList.toggle('hidden', numPaso !== 1);
+      seccionPaso2.classList.toggle('hidden', numPaso !== 2);
+      seccionPaso3.classList.toggle('hidden', numPaso !== 3);
+
+      stepIndicator1.className = 'step-item ' + (numPaso === 1 ? 'active' : 'completed');
+      stepIndicator2.className = 'step-item ' + (numPaso === 2 ? 'active' : (numPaso > 2 ? 'completed' : ''));
+      stepIndicator3.className = 'step-item ' + (numPaso === 3 ? 'active' : '');
+
+      [stepIndicator1, stepIndicator2, stepIndicator3].forEach((el, idx) => {
+        const n = idx + 1;
+        el.disabled = !(n < numPaso); // solo se puede regresar a pasos ya completados
+        if (n === numPaso) el.setAttribute('aria-current', 'step');
+        else el.removeAttribute('aria-current');
+      });
+      stepperNav.dataset.step = String(numPaso);
+
+      if (numPaso === 2) {
+        prepararPaso2();
+      }
+      pasoActual = numPaso;
+      window.scrollTo({ top: 0, behavior: prefiereMenosMovimiento.matches ? 'auto' : 'smooth' });
+      document.dispatchEvent(new CustomEvent('cotizador:paso', { detail: { paso: numPaso, anterior: pasoAnterior } }));
+    }
+
+    stepIndicator1.addEventListener('click', () => { if (pasoActual > 1) irAPaso(1); });
+    stepIndicator2.addEventListener('click', () => { if (pasoActual > 2) irAPaso(2); });
+
+    document.getElementById('btnVolverPaso1Top').addEventListener('click', () => irAPaso(1));
+    document.getElementById('btnVolverPaso1Bottom').addEventListener('click', () => irAPaso(1));
+    document.getElementById('btnModificarParametros').addEventListener('click', () => irAPaso(2));
+
+    document.getElementById('btnNuevaCotizacion').addEventListener('click', () => {
+      formPaso1.reset();
+      formPaso2.reset();
+      document.querySelectorAll('.choice-card').forEach((card) => {
+        const r = card.querySelector('input[type="radio"]');
+        card.classList.toggle('selected', r ? r.checked : false);
+      });
+      ocultarAlertaPaso1();
+      ocultarAlertaPaso2();
+      actualizarPreviewEdadPaso1();
+      irAPaso(1);
+    });
+
+    document.getElementById('btnImprimirComprobante').addEventListener('click', () => {
+      const details = document.getElementById('memoriaCalculoDetails');
+      if (details) details.open = true;
+      window.print();
+    });
+
+    // 8. LÓGICA DEL PASO 2: CAMPOS DINÁMICOS Y VISTA PREVIA DE FÓRMULA
+    function ocultarAlertaPaso2() {
+      alertaPaso2.classList.add('hidden');
+    }
+
+    function mostrarAlertaPaso2(msg) {
+      mensajeAlertaPaso2.innerHTML = msg;
+      alertaPaso2.classList.remove('hidden');
+    }
+
+    function prepararPaso2() {
+      const x = estadoApp.edadActuarial;
+      const maxPlazo = OMEGA - x;
+
+      document.getElementById('resumenNombrePaso2').textContent = estadoApp.nombre;
+      document.getElementById('resumenEdadRealPaso2').textContent = `${estadoApp.edadReal} años`;
+      document.getElementById('resumenPerfilPaso2').textContent =
+        `${estadoApp.sexo === 'F' ? 'Femenino (-2)' : 'Masculino (0)'} • ${!estadoApp.fuma ? 'No Fumador (-2)' : 'Fumador (0)'}`;
+      document.getElementById('resumenEdadActuarialPaso2').textContent =
+        `x = ${x} años${estadoApp.truncadaA14 ? ' (truncada a 14)' : ''}`;
+      document.getElementById('resumenPlazoMaxPaso2').textContent = `${maxPlazo} años (hasta ω = ${OMEGA})`;
+
+      const esSeguro = estadoApp.categoria === 'seguro';
+      panelConfigSeguro.classList.toggle('hidden', !esSeguro);
+      panelConfigAnualidad.classList.toggle('hidden', esSeguro);
+
+      document.getElementById('tituloPaso2').textContent = esSeguro
+        ? 'Configuración del seguro de vida'
+        : 'Configuración de la anualidad contingente';
+      document.getElementById('subtituloPaso2').textContent = esSeguro
+        ? 'Seleccione el tipo de seguro, la modalidad de prima y los plazos correspondientes.'
+        : 'Seleccione el momento de pago (anticipada o vencida), el tipo de anualidad y el monto de renta.';
+
+      ocultarAlertaPaso2();
+      actualizarVisibilidadPaso2();
+    }
+
+    function actualizarVisibilidadPaso2() {
+      const x = estadoApp.edadActuarial;
+      const maxPlazo = OMEGA - x;
+
+      if (estadoApp.categoria === 'seguro') {
+        const tipo = selectTipoSeguro.value;
+        const mod = selectModalidadPrima.value;
+
+        const requiereM = (tipo === 'diferido_temporal' || tipo === 'diferido_vitalicio');
+        const requiereN = (tipo === 'temporal' || tipo === 'diferido_temporal' || tipo === 'dotal_puro' || tipo === 'dotal_mixto');
+        const requiereH = (mod === 'PNN_LIMITADOS');
+        const esDiferidoPNN = (requiereM && mod === 'PNN');
+
+        const opcionTotal = selectCriterioPNNDiferido.querySelector('option[value="total"]');
+        const esDiferidoVitalicio = (tipo === 'diferido_vitalicio');
+        opcionTotal.hidden = esDiferidoVitalicio;
+        opcionTotal.disabled = esDiferidoVitalicio;
+        if (esDiferidoVitalicio && selectCriterioPNNDiferido.value === 'total') {
+          selectCriterioPNNDiferido.value = 'temporalidad'; // mismo resultado (ä_x)
+        }
+
+        grupoSegDiferimiento.classList.toggle('hidden', !requiereM);
+        grupoSegTemporalidad.classList.toggle('hidden', !requiereN);
+        grupoSegPagosH.classList.toggle('hidden', !requiereH);
+        grupoCriterioPNNDiferido.classList.toggle('hidden', !esDiferidoPNN);
+
+        // Descripciones de ayuda
+        const descSegMap = {
+          temporal: 'Paga la Suma Asegurada si el asegurado fallece dentro de los próximos n años.',
+          diferido_temporal: 'Inicia cobertura tras m años de diferimiento y cubre el fallecimiento durante los siguientes n años.',
+          diferido_vitalicio: 'Inicia cobertura tras m años de diferimiento y protege de por vida al asegurado.',
+          dotal_puro: 'Paga la Suma Asegurada únicamente si el asegurado sobrevive al final del plazo de n años.',
+          dotal_mixto: 'Paga la Suma Asegurada si fallece dentro de los n años o si sobrevive al final del plazo n.',
+          vitalicio: 'Cobertura de por vida (ordinario de vida); paga la Suma Asegurada al ocurrir el fallecimiento.'
+        };
+        document.getElementById('descTipoSeguro').textContent = descSegMap[tipo] || '';
+
+        const descModMap = {
+          PNU: 'Prima Neta Única (PNU): Un solo pago al inicio de la cobertura (edad x).',
+          PNN: 'Prima Neta Nivelada (PNN): Pagos anuales iguales anticipados durante el periodo del seguro.',
+          PNN_LIMITADOS: 'Pagos Limitados (h): Pagos anuales iguales anticipados durante exactamente h años.'
+        };
+        document.getElementById('descModalidadPrima').textContent = descModMap[mod] || '';
+
+        const m = requiereM ? Math.max(1, parseInt(inputSegM.value, 10) || 0) : 0;
+        const n = requiereN ? Math.max(1, parseInt(inputSegN.value, 10) || 0) : 0;
+        const h = requiereH ? Math.max(1, parseInt(inputSegH.value, 10) || 0) : 0;
+
+        document.getElementById('hintSegM').textContent = `Rango permitido: 1 a ${maxPlazo} años (x + m ≤ ${OMEGA}).`;
+        document.getElementById('hintSegN').textContent = requiereM
+          ? `Rango permitido: x + m + n ≤ ${OMEGA} (máx n = ${Math.max(1, maxPlazo - m)}).`
+          : `Rango permitido: 1 a ${maxPlazo} años (x + n ≤ ${OMEGA}).`;
+        document.getElementById('hintSegH').textContent = requiereN
+          ? (requiereM
+              ? `Debe cumplir 1 ≤ h ≤ m + n (máx ${m + n} pagos) y x + h ≤ ${OMEGA}.`
+              : `Debe cumplir 1 ≤ h ≤ n (máx ${n} pagos) y x + h ≤ ${OMEGA}.`)
+          : `Debe cumplir 1 ≤ h ≤ ${maxPlazo} pagos (x + h ≤ ${OMEGA}).`;
+
+        // Actualizar preview de fórmula
+        let numFormula = '';
+        let pnuSimbolo = '';
+        if (tipo === 'vitalicio') {
+          pnuSimbolo = `A_${x}`;
+          numFormula = `M_${x} / D_${x}`;
+        } else if (tipo === 'temporal') {
+          pnuSimbolo = `A¹_{${x}:${n}|}`;
+          numFormula = `(M_${x} - M_${x + n}) / D_${x}`;
+        } else if (tipo === 'diferido_vitalicio') {
+          pnuSimbolo = `_{${m}|}A_${x}`;
+          numFormula = `M_${x + m} / D_${x}`;
+        } else if (tipo === 'diferido_temporal') {
+          pnuSimbolo = `_{${m}|${n}}A_${x}`;
+          numFormula = `(M_${x + m} - M_${x + m + n}) / D_${x}`;
+        } else if (tipo === 'dotal_puro') {
+          pnuSimbolo = `A_{${x}:${n}|¹}`;
+          numFormula = `D_${x + n} / D_${x}`;
+        } else if (tipo === 'dotal_mixto') {
+          pnuSimbolo = `A_{${x}:${n}|}`;
+          numFormula = `(M_${x} - M_${x + n} + D_${x + n}) / D_${x}`;
+        }
+
+        if (mod === 'PNU') {
+          textoFormulaPreview.textContent = `PNU = SA × ${pnuSimbolo} = SA × [ ${numFormula} ]`;
+        } else if (mod === 'PNN') {
+          let denSimbolo = '';
+          if (tipo === 'vitalicio') {
+            denSimbolo = `ä_${x} = N_${x} / D_${x}`;
+          } else if (tipo === 'temporal' || tipo === 'dotal_puro' || tipo === 'dotal_mixto') {
+            denSimbolo = `ä_{${x}:${n}|} = (N_${x} - N_${x + n}) / D_${x}`;
+          } else {
+            const crit = selectCriterioPNNDiferido.value;
+            if (crit === 'diferimiento') {
+              denSimbolo = `ä_{${x}:${m}|} = (N_${x} - N_${x + m}) / D_${x}`;
+            } else if (crit === 'temporalidad') {
+              denSimbolo = (tipo === 'diferido_vitalicio')
+                ? `ä_${x} = N_${x} / D_${x}`
+                : `ä_{${x}:${n}|} = (N_${x} - N_${x + n}) / D_${x}`;
+            } else {
+              denSimbolo = (tipo === 'diferido_vitalicio')
+                ? `ä_${x} = N_${x} / D_${x}`
+                : `ä_{${x}:${m + n}|} = (N_${x} - N_${x + m + n}) / D_${x}`;
+            }
+          }
+          textoFormulaPreview.textContent = `PNN = SA × [ (${pnuSimbolo}) / (${denSimbolo}) ]`;
+        } else if (mod === 'PNN_LIMITADOS') {
+          textoFormulaPreview.textContent =
+            `PNN (${h} pagos) = SA × [ (${pnuSimbolo}) / ä_{${x}:${h}|} ]  donde  ä_{${x}:${h}|} = (N_${x} - N_${x + h}) / D_${x}`;
+        }
+
+        etiquetaEdadesPreview.textContent =
+          `x = ${x}` + (requiereM ? `, x+m = ${x + m}` : '') + (requiereN ? `, x+${requiereM ? 'm+' : ''}n = ${x + m + n}` : '') + (requiereH ? `, x+h = ${x + h}` : '');
+
+      } else {
+        // ANUALIDAD CONTINGENTE
+        const tipoAnu = selectTipoAnualidad.value;
+        const momRadio = document.querySelector('input[name="momentoAnualidad"]:checked');
+        const momento = momRadio ? momRadio.value : 'anticipada';
+        const esAnticipada = (momento === 'anticipada');
+
+        const requiereM = (tipoAnu === 'diferida_temporal' || tipoAnu === 'diferida_vitalicia');
+        const requiereN = (tipoAnu === 'temporal' || tipoAnu === 'diferida_temporal');
+
+        grupoAnuDiferimiento.classList.toggle('hidden', !requiereM);
+        grupoAnuTemporalidad.classList.toggle('hidden', !requiereN);
+
+        const m = requiereM ? Math.max(1, parseInt(inputAnuM.value, 10) || 0) : 0;
+        const n = requiereN ? Math.max(1, parseInt(inputAnuN.value, 10) || 0) : 0;
+
+        document.getElementById('hintAnuM').textContent = `Rango permitido: 1 a ${maxPlazo} años (x + m ≤ ${OMEGA}).`;
+        document.getElementById('hintAnuN').textContent = requiereM
+          ? `Rango permitido: x + m + n ≤ ${OMEGA} (máx n = ${Math.max(1, maxPlazo - m)}).`
+          : `Rango permitido: 1 a ${maxPlazo} años (x + n ≤ ${OMEGA}).`;
+
+        let formulaStr = '';
+        if (tipoAnu === 'vitalicia') {
+          formulaStr = esAnticipada
+            ? `VPA = R × ä_${x} = R × [ N_${x} / D_${x} ]`
+            : `VPA = R × a_${x} = R × [ N_${x + 1} / D_${x} ]`;
+        } else if (tipoAnu === 'temporal') {
+          formulaStr = esAnticipada
+            ? `VPA = R × ä_{${x}:${n}|} = R × [ (N_${x} - N_${x + n}) / D_${x} ]`
+            : `VPA = R × a_{${x}:${n}|} = R × [ (N_${x + 1} - N_${x + n + 1}) / D_${x} ]`;
+        } else if (tipoAnu === 'diferida_vitalicia') {
+          formulaStr = esAnticipada
+            ? `VPA = R × _{${m}|}ä_${x} = R × [ N_${x + m} / D_${x} ]`
+            : `VPA = R × _{${m}|}a_${x} = R × [ N_${x + m + 1} / D_${x} ]`;
+        } else if (tipoAnu === 'diferida_temporal') {
+          formulaStr = esAnticipada
+            ? `VPA = R × _{${m}|${n}}ä_${x} = R × [ (N_${x + m} - N_${x + m + n}) / D_${x} ]`
+            : `VPA = R × _{${m}|${n}}a_${x} = R × [ (N_${x + m + 1} - N_${x + m + n + 1}) / D_${x} ]`;
+        }
+
+        textoFormulaPreview.textContent = formulaStr;
+        etiquetaEdadesPreview.textContent =
+          `x = ${x}` + (requiereM ? `, x+m = ${x + m}` : '') + (requiereN ? `, x+${requiereM ? 'm+' : ''}n = ${x + m + n}` : '');
+      }
+    }
+
+    [
+      selectTipoSeguro,
+      selectModalidadPrima,
+      selectCriterioPNNDiferido,
+      inputSegM,
+      inputSegN,
+      inputSegH,
+      selectTipoAnualidad,
+      inputAnuM,
+      inputAnuN
+    ].forEach((el) => {
+      el.addEventListener('input', () => {
+        ocultarAlertaPaso2();
+        actualizarVisibilidadPaso2();
+      });
+      el.addEventListener('change', () => {
+        ocultarAlertaPaso2();
+        actualizarVisibilidadPaso2();
+      });
+    });
+
+    // 9. MOTOR DE CÁLCULO ACTUARIAL Y VALIDACIONES DE LÍMITES (ω = 100)
+    formPaso2.addEventListener('submit', (e) => {
+      e.preventDefault();
+      ocultarAlertaPaso2();
+
+      if (estadoApp.categoria === 'seguro') {
+        procesarCotizacionSeguro();
+      } else {
+        procesarCotizacionAnualidad();
+      }
+    });
+
+    function procesarCotizacionSeguro() {
+      const x = estadoApp.edadActuarial;
+      const tipo = selectTipoSeguro.value;
+      const mod = selectModalidadPrima.value;
+
+      const requiereM = (tipo === 'diferido_temporal' || tipo === 'diferido_vitalicio');
+      const requiereN = (tipo === 'temporal' || tipo === 'diferido_temporal' || tipo === 'dotal_puro' || tipo === 'dotal_mixto');
+      const requiereH = (mod === 'PNN_LIMITADOS');
+
+      const m = requiereM ? Number(inputSegM.value) : 0;
+      const n = requiereN ? Number(inputSegN.value) : 0;
+      const h = requiereH ? Number(inputSegH.value) : 0;
+      const SA = Number(inputSumaAsegurada.value);
+
+      // Validaciones de enteros positivos
+      if (requiereM && (!Number.isInteger(m) || m < 1)) {
+        mostrarAlertaPaso2('El <strong>periodo de diferimiento (m)</strong> debe ser un número entero mayor o igual a 1.');
+        return;
+      }
+      if (requiereN && (!Number.isInteger(n) || n < 1)) {
+        mostrarAlertaPaso2('La <strong>temporalidad del seguro (n)</strong> debe ser un número entero mayor o igual a 1.');
+        return;
+      }
+      if (requiereH && (!Number.isInteger(h) || h < 1)) {
+        mostrarAlertaPaso2('El <strong>número de pagos limitados (h)</strong> debe ser un número entero mayor o igual a 1.');
+        return;
+      }
+      if (isNaN(SA) || SA <= 0) {
+        mostrarAlertaPaso2('La <strong>Suma Asegurada (SA)</strong> debe ser un monto mayor a $0.00 MXN.');
+        return;
+      }
+      if (!isFinite(SA) || SA > MONTO_MAXIMO) {
+        mostrarAlertaPaso2(`La <strong>Suma Asegurada (SA)</strong> no puede exceder <strong>${fmtMoneda(MONTO_MAXIMO)}</strong>.`);
+        return;
+      }
+
+      // Validación de límite omega (x + m + n <= 100)
+      if (x + m + n > OMEGA) {
+        const plazoMax = OMEGA - x;
+        mostrarAlertaPaso2(
+          `<strong>Límite de la tabla CNSF 2000-I excedido (ω = ${OMEGA} años):</strong><br/>` +
+          `La suma de la edad actuarial ajustada (<strong>x = ${x}</strong>)` +
+          (requiereM ? ` + diferimiento (<strong>m = ${m}</strong>)` : '') +
+          (requiereN ? ` + temporalidad (<strong>n = ${n}</strong>)` : '') +
+          ` es igual a <strong>${x + m + n} años</strong>, lo cual supera la edad límite ω = ${OMEGA}. ` +
+          `El plazo total máximo permitido para este asegurado es de <strong>${plazoMax} años</strong>.`
+        );
+        return;
+      }
+
+      // Validación de pagos limitados (h)
+      if (requiereH) {
+        if (requiereN && h > m + n) {
+          mostrarAlertaPaso2(
+            requiereM
+              ? `<strong>Validación de Pagos Limitados (h):</strong> El número de pagos (<strong>h = ${h}</strong>) debe ser menor o igual al plazo total del seguro (<strong>m + n = ${m + n}</strong>).`
+              : `<strong>Validación de Pagos Limitados (h):</strong> El número de pagos (<strong>h = ${h}</strong>) debe ser menor o igual a la temporalidad del seguro (<strong>n = ${n}</strong>).`
+          );
+          return;
+        }
+        if (x + h > OMEGA) {
+          mostrarAlertaPaso2(
+            `<strong>Límite de edad en pagos (x + h > ${OMEGA}):</strong> La edad al finalizar los pagos (${x} + ${h} = ${x + h}) no puede exceder ω = ${OMEGA}.`
+          );
+          return;
+        }
+      }
+
+      // Obtención de valores conmutados
+      const Dx = getConmutado(x, 'Dx');
+      const Nx = getConmutado(x, 'Nx');
+      const Mx = getConmutado(x, 'Mx');
+
+      let pnuUnitaria = 0;
+      let formulaSimbolicaPNU = '';
+      let sustitucionPNU = '';
+      const edadesInvolucradas = [{ edad: x, rol: 'Edad actuarial inicial (x)' }];
+
+      if (tipo === 'vitalicio') {
+        pnuUnitaria = Mx / Dx;
+        formulaSimbolicaPNU = `A_${x} = M_${x} / D_${x}`;
+        sustitucionPNU = `${fmtNum(Mx, 4)} / ${fmtNum(Dx, 4)} = ${fmtNum(pnuUnitaria, 8)}`;
+      } else if (tipo === 'temporal') {
+        const Mxn = getConmutado(x + n, 'Mx');
+        pnuUnitaria = (Mx - Mxn) / Dx;
+        formulaSimbolicaPNU = `A¹_{${x}:${n}|} = (M_${x} - M_${x + n}) / D_${x}`;
+        sustitucionPNU = `(${fmtNum(Mx, 4)} - ${fmtNum(Mxn, 4)}) / ${fmtNum(Dx, 4)} = ${fmtNum(pnuUnitaria, 8)}`;
+        edadesInvolucradas.push({ edad: x + n, rol: `Fin de temporalidad (x + n = ${x + n})` });
+      } else if (tipo === 'diferido_vitalicio') {
+        const Mxm = getConmutado(x + m, 'Mx');
+        pnuUnitaria = Mxm / Dx;
+        formulaSimbolicaPNU = `_{${m}|}A_${x} = M_${x + m} / D_${x}`;
+        sustitucionPNU = `${fmtNum(Mxm, 4)} / ${fmtNum(Dx, 4)} = ${fmtNum(pnuUnitaria, 8)}`;
+        edadesInvolucradas.push({ edad: x + m, rol: `Fin de diferimiento (x + m = ${x + m})` });
+      } else if (tipo === 'diferido_temporal') {
+        const Mxm = getConmutado(x + m, 'Mx');
+        const Mxmn = getConmutado(x + m + n, 'Mx');
+        pnuUnitaria = (Mxm - Mxmn) / Dx;
+        formulaSimbolicaPNU = `_{${m}|${n}}A_${x} = (M_${x + m} - M_${x + m + n}) / D_${x}`;
+        sustitucionPNU = `(${fmtNum(Mxm, 4)} - ${fmtNum(Mxmn, 4)}) / ${fmtNum(Dx, 4)} = ${fmtNum(pnuUnitaria, 8)}`;
+        edadesInvolucradas.push({ edad: x + m, rol: `Fin de diferimiento (x + m = ${x + m})` });
+        edadesInvolucradas.push({ edad: x + m + n, rol: `Fin de cobertura (x + m + n = ${x + m + n})` });
+      } else if (tipo === 'dotal_puro') {
+        const Dxn = getConmutado(x + n, 'Dx');
+        pnuUnitaria = Dxn / Dx;
+        formulaSimbolicaPNU = `A_{${x}:${n}|¹} = D_${x + n} / D_${x}`;
+        sustitucionPNU = `${fmtNum(Dxn, 4)} / ${fmtNum(Dx, 4)} = ${fmtNum(pnuUnitaria, 8)}`;
+        edadesInvolucradas.push({ edad: x + n, rol: `Vencimiento dotal (x + n = ${x + n})` });
+      } else if (tipo === 'dotal_mixto') {
+        const Mxn = getConmutado(x + n, 'Mx');
+        const Dxn = getConmutado(x + n, 'Dx');
+        pnuUnitaria = (Mx - Mxn + Dxn) / Dx;
+        formulaSimbolicaPNU = `A_{${x}:${n}|} = (M_${x} - M_${x + n} + D_${x + n}) / D_${x}`;
+        sustitucionPNU = `(${fmtNum(Mx, 4)} - ${fmtNum(Mxn, 4)} + ${fmtNum(Dxn, 4)}) / ${fmtNum(Dx, 4)} = ${fmtNum(pnuUnitaria, 8)}`;
+        edadesInvolucradas.push({ edad: x + n, rol: `Fin de plazo dotal mixto (x + n = ${x + n})` });
+      }
+
+      // Cálculo según modalidad de prima (PNU, PNN, Pagos Limitados)
+      let factorFinal = pnuUnitaria;
+      let anualidadPago = 1.0;
+      let formulaAnualidadPago = '1 (Pago Único)';
+      let sustitucionAnualidadPago = 'No aplica división por anualidad (Modalidad PNU)';
+      let etiquetaPrimaResultado = 'Prima Neta Única (PNU)';
+      let subPrimaExplicacion = 'Pago único al inicio de la vigencia';
+
+      if (mod === 'PNN') {
+        etiquetaPrimaResultado = 'Prima Neta Nivelada Anual (PNN)';
+        if (tipo === 'vitalicio') {
+          anualidadPago = Nx / Dx;
+          formulaAnualidadPago = `ä_${x} = N_${x} / D_${x}`;
+          sustitucionAnualidadPago = `${fmtNum(Nx, 4)} / ${fmtNum(Dx, 4)} = ${fmtNum(anualidadPago, 8)}`;
+          subPrimaExplicacion = 'Prima anual anticipada vitalicia';
+        } else if (tipo === 'temporal' || tipo === 'dotal_puro' || tipo === 'dotal_mixto') {
+          const Nxn = getConmutado(x + n, 'Nx');
+          anualidadPago = (Nx - Nxn) / Dx;
+          formulaAnualidadPago = `ä_{${x}:${n}|} = (N_${x} - N_${x + n}) / D_${x}`;
+          sustitucionAnualidadPago = `(${fmtNum(Nx, 4)} - ${fmtNum(Nxn, 4)}) / ${fmtNum(Dx, 4)} = ${fmtNum(anualidadPago, 8)}`;
+          subPrimaExplicacion = `Prima anual anticipada durante ${n} años`;
+        } else {
+          // Seguros diferidos en PNN
+          const crit = selectCriterioPNNDiferido.value;
+          if (crit === 'diferimiento') {
+            const Nxm = getConmutado(x + m, 'Nx');
+            anualidadPago = (Nx - Nxm) / Dx;
+            formulaAnualidadPago = `ä_{${x}:${m}|} = (N_${x} - N_${x + m}) / D_${x}`;
+            sustitucionAnualidadPago = `(${fmtNum(Nx, 4)} - ${fmtNum(Nxm, 4)}) / ${fmtNum(Dx, 4)} = ${fmtNum(anualidadPago, 8)}`;
+            subPrimaExplicacion = `Prima anual anticipada durante los ${m} años de diferimiento`;
+          } else if (crit === 'temporalidad') {
+            if (tipo === 'diferido_vitalicio') {
+              anualidadPago = Nx / Dx;
+              formulaAnualidadPago = `ä_${x} = N_${x} / D_${x}`;
+              sustitucionAnualidadPago = `${fmtNum(Nx, 4)} / ${fmtNum(Dx, 4)} = ${fmtNum(anualidadPago, 8)}`;
+              subPrimaExplicacion = 'Prima anual anticipada vitalicia desde edad x';
+            } else {
+              const Nxn = getConmutado(x + n, 'Nx');
+              anualidadPago = (Nx - Nxn) / Dx;
+              formulaAnualidadPago = `ä_{${x}:${n}|} = (N_${x} - N_${x + n}) / D_${x}`;
+              sustitucionAnualidadPago = `(${fmtNum(Nx, 4)} - ${fmtNum(Nxn, 4)}) / ${fmtNum(Dx, 4)} = ${fmtNum(anualidadPago, 8)}`;
+              subPrimaExplicacion = `Prima anual anticipada durante ${n} años`;
+              edadesInvolucradas.push({ edad: x + n, rol: `Fin de periodo de pago (x + n = ${x + n})` });
+            }
+          } else {
+            if (tipo === 'diferido_vitalicio') {
+              anualidadPago = Nx / Dx;
+              formulaAnualidadPago = `ä_${x} = N_${x} / D_${x}`;
+              sustitucionAnualidadPago = `${fmtNum(Nx, 4)} / ${fmtNum(Dx, 4)} = ${fmtNum(anualidadPago, 8)}`;
+              subPrimaExplicacion = 'Prima anual anticipada vitalicia';
+            } else {
+              const Nxmn = getConmutado(x + m + n, 'Nx');
+              anualidadPago = (Nx - Nxmn) / Dx;
+              formulaAnualidadPago = `ä_{${x}:${m + n}|} = (N_${x} - N_${x + m + n}) / D_${x}`;
+              sustitucionAnualidadPago = `(${fmtNum(Nx, 4)} - ${fmtNum(Nxmn, 4)}) / ${fmtNum(Dx, 4)} = ${fmtNum(anualidadPago, 8)}`;
+              subPrimaExplicacion = `Prima anual anticipada durante ${m + n} años (m + n)`;
+            }
+          }
+        }
+        factorFinal = pnuUnitaria / anualidadPago;
+      } else if (mod === 'PNN_LIMITADOS') {
+        const Nxh = getConmutado(x + h, 'Nx');
+        anualidadPago = (Nx - Nxh) / Dx;
+        formulaAnualidadPago = `ä_{${x}:${h}|} = (N_${x} - N_${x + h}) / D_${x}`;
+        sustitucionAnualidadPago = `(${fmtNum(Nx, 4)} - ${fmtNum(Nxh, 4)}) / ${fmtNum(Dx, 4)} = ${fmtNum(anualidadPago, 8)}`;
+        factorFinal = pnuUnitaria / anualidadPago;
+        etiquetaPrimaResultado = `PNN con Pagos Limitados (${h} pagos)`;
+        subPrimaExplicacion = `Prima anual anticipada limitada a ${h} pagos`;
+        edadesInvolucradas.push({ edad: x + h, rol: `Fin de pagos limitados (x + h = ${x + h})` });
+      }
+
+      const primaTotal = SA * factorFinal;
+
+      const nombresSeguro = {
+        temporal: `Seguro de Vida Temporal (${n} años)`,
+        diferido_temporal: `Seguro de Vida Diferido Temporal (m = ${m}, n = ${n} años)`,
+        diferido_vitalicio: `Seguro de Vida Diferido Vitalicio (m = ${m} años)`,
+        dotal_puro: `Seguro Dotal Puro (${n} años)`,
+        dotal_mixto: `Seguro Dotal Mixto (${n} años)`,
+        vitalicio: 'Seguro de Vida Vitalicio (Ordinario de Vida)'
+      };
+
+      const nombresModalidad = {
+        PNU: 'Prima Neta Única (PNU)',
+        PNN: 'Prima Neta Nivelada (PNN)',
+        PNN_LIMITADOS: `Prima Neta Nivelada con Pagos Limitados (h = ${h} pagos)`
+      };
+
+      renderizarComprobante({
+        tituloCertificado: nombresSeguro[tipo],
+        lblMontoBase: 'Suma Asegurada (SA)',
+        valMontoBase: SA,
+        subMontoBase: 'Monto nominal de protección por fallecimiento / supervivencia',
+        lblFactor: mod === 'PNU' ? 'Factor PNU Unitario' : 'Factor de Prima Anual Unitario',
+        valFactor: factorFinal,
+        lblPrima: etiquetaPrimaResultado,
+        valPrima: primaTotal,
+        subPrima: subPrimaExplicacion,
+        detallesProducto: [
+          { k: 'Categoría', v: 'Seguro de Vida' },
+          { k: 'Tipo de Seguro', v: nombresSeguro[tipo] },
+          { k: 'Modalidad de Prima', v: nombresModalidad[mod] },
+          ...(requiereM ? [{ k: 'Diferimiento (m)', v: `${m} años (inicia cobertura a edad ${x + m})` }] : []),
+          ...(requiereN ? [{ k: 'Temporalidad (n)', v: `${n} años (termina a edad ${x + m + n})` }] : []),
+          ...(requiereH ? [{ k: 'Pagos Limitados (h)', v: `${h} pagos anuales (de edad ${x} a ${x + h})` }] : []),
+          { k: 'Tasa de Interés Técnico', v: '5.00% anual (CNSF 2000-I)' }
+        ],
+        htmlPasoAPaso:
+          `<div><span class="hl-cyan">1. Ajuste de Edad Actuarial (x):</span></div>` +
+          `<div>   x = max(14, ${estadoApp.edadReal} - ${estadoApp.sexo === 'F' ? 2 : 0} - ${!estadoApp.fuma ? 2 : 0}) = <span class="hl-green">${x} años</span></div>` +
+          `<div style="margin-top:0.5rem;"><span class="hl-cyan">2. Prima Neta Única por unidad de Suma Asegurada (PNU unitaria):</span></div>` +
+          `<div>   Fórmula: ${formulaSimbolicaPNU}</div>` +
+          `<div>   Sustitución: ${sustitucionPNU}</div>` +
+          (mod !== 'PNU'
+            ? `<div style="margin-top:0.5rem;"><span class="hl-cyan">3. Anualidad de Pago de Primas (ä):</span></div>` +
+              `<div>   Fórmula: ${formulaAnualidadPago}</div>` +
+              `<div>   Sustitución: ${sustitucionAnualidadPago}</div>` +
+              `<div style="margin-top:0.5rem;"><span class="hl-cyan">4. Factor de Prima Nivelada Unitaria (P = PNU / ä):</span></div>` +
+              `<div>   P = ${fmtNum(pnuUnitaria, 8)} / ${fmtNum(anualidadPago, 8)} = <span class="hl-amber">${fmtNum(factorFinal, 8)}</span></div>`
+            : '') +
+          `<div style="margin-top:0.5rem;"><span class="hl-cyan">${mod === 'PNU' ? '3' : '5'}. Prima Calculada Total (SA × Factor):</span></div>` +
+          `<div>   Prima = ${fmtMoneda(SA)} × ${fmtNum(factorFinal, 8)} = <span class="hl-green">${fmtMoneda(primaTotal)}</span> (${fmtNum(primaTotal, 4)} MXN)</div>`,
+        edadesInvolucradas
+      });
+    }
+
+    function procesarCotizacionAnualidad() {
+      const x = estadoApp.edadActuarial;
+      const tipoAnu = selectTipoAnualidad.value;
+      const momRadio = document.querySelector('input[name="momentoAnualidad"]:checked');
+      const momento = momRadio ? momRadio.value : 'anticipada';
+      const esAnticipada = (momento === 'anticipada');
+
+      const requiereM = (tipoAnu === 'diferida_temporal' || tipoAnu === 'diferida_vitalicia');
+      const requiereN = (tipoAnu === 'temporal' || tipoAnu === 'diferida_temporal');
+
+      const m = requiereM ? Number(inputAnuM.value) : 0;
+      const n = requiereN ? Number(inputAnuN.value) : 0;
+      const R = Number(inputMontoRenta.value);
+
+      if (requiereM && (!Number.isInteger(m) || m < 1)) {
+        mostrarAlertaPaso2('El <strong>periodo de diferimiento (m)</strong> debe ser un número entero mayor o igual a 1.');
+        return;
+      }
+      if (requiereN && (!Number.isInteger(n) || n < 1)) {
+        mostrarAlertaPaso2('La <strong>temporalidad de la anualidad (n)</strong> debe ser un número entero mayor o igual a 1.');
+        return;
+      }
+      if (isNaN(R) || R <= 0) {
+        mostrarAlertaPaso2('El <strong>Monto de la Renta (R)</strong> debe ser mayor a $0.00 MXN.');
+        return;
+      }
+      if (!isFinite(R) || R > MONTO_MAXIMO) {
+        mostrarAlertaPaso2(`El <strong>Monto de la Renta (R)</strong> no puede exceder <strong>${fmtMoneda(MONTO_MAXIMO)}</strong>.`);
+        return;
+      }
+
+      if (x + m + n > OMEGA) {
+        const plazoMax = OMEGA - x;
+        mostrarAlertaPaso2(
+          `<strong>Límite de la tabla CNSF 2000-I excedido (ω = ${OMEGA} años):</strong><br/>` +
+          `La suma de la edad actuarial ajustada (<strong>x = ${x}</strong>)` +
+          (requiereM ? ` + diferimiento (<strong>m = ${m}</strong>)` : '') +
+          (requiereN ? ` + temporalidad (<strong>n = ${n}</strong>)` : '') +
+          ` es igual a <strong>${x + m + n} años</strong>, lo cual supera ω = ${OMEGA}. ` +
+          `El plazo total máximo disponible para este asegurado es de <strong>${plazoMax} años</strong>.`
+        );
+        return;
+      }
+
+      const Dx = getConmutado(x, 'Dx');
+      let factorAnualidad = 0;
+      let formulaSimbolica = '';
+      let sustitucionTexto = '';
+      const edadesInvolucradas = [{ edad: x, rol: 'Edad actuarial inicial (x)' }];
+
+      if (tipoAnu === 'vitalicia') {
+        if (esAnticipada) {
+          const Nx = getConmutado(x, 'Nx');
+          factorAnualidad = Nx / Dx;
+          formulaSimbolica = `ä_${x} = N_${x} / D_${x}`;
+          sustitucionTexto = `${fmtNum(Nx, 4)} / ${fmtNum(Dx, 4)} = ${fmtNum(factorAnualidad, 8)}`;
+        } else {
+          const Nx1 = getConmutado(x + 1, 'Nx');
+          factorAnualidad = Nx1 / Dx;
+          formulaSimbolica = `a_${x} = N_${x + 1} / D_${x}`;
+          sustitucionTexto = `${fmtNum(Nx1, 4)} / ${fmtNum(Dx, 4)} = ${fmtNum(factorAnualidad, 8)}`;
+          edadesInvolucradas.push({ edad: x + 1, rol: `Inicio de renta vencida (x + 1 = ${x + 1})` });
+        }
+      } else if (tipoAnu === 'temporal') {
+        if (esAnticipada) {
+          const Nx = getConmutado(x, 'Nx');
+          const Nxn = getConmutado(x + n, 'Nx');
+          factorAnualidad = (Nx - Nxn) / Dx;
+          formulaSimbolica = `ä_{${x}:${n}|} = (N_${x} - N_${x + n}) / D_${x}`;
+          sustitucionTexto = `(${fmtNum(Nx, 4)} - ${fmtNum(Nxn, 4)}) / ${fmtNum(Dx, 4)} = ${fmtNum(factorAnualidad, 8)}`;
+          edadesInvolucradas.push({ edad: x + n, rol: `Fin de temporalidad anticipada (x + n = ${x + n})` });
+        } else {
+          const Nx1 = getConmutado(x + 1, 'Nx');
+          const Nxn1 = getConmutado(x + n + 1, 'Nx');
+          factorAnualidad = (Nx1 - Nxn1) / Dx;
+          formulaSimbolica = `a_{${x}:${n}|} = (N_${x + 1} - N_${x + n + 1}) / D_${x}`;
+          sustitucionTexto = `(${fmtNum(Nx1, 4)} - ${fmtNum(Nxn1, 4)}) / ${fmtNum(Dx, 4)} = ${fmtNum(factorAnualidad, 8)}`;
+          edadesInvolucradas.push({ edad: x + 1, rol: `Inicio de renta vencida (x + 1 = ${x + 1})` });
+          edadesInvolucradas.push({ edad: x + n + 1, rol: `Fin de renta vencida (x + n + 1 = ${x + n + 1})` });
+        }
+      } else if (tipoAnu === 'diferida_vitalicia') {
+        if (esAnticipada) {
+          const Nxm = getConmutado(x + m, 'Nx');
+          factorAnualidad = Nxm / Dx;
+          formulaSimbolica = `_{${m}|}ä_${x} = N_${x + m} / D_${x}`;
+          sustitucionTexto = `${fmtNum(Nxm, 4)} / ${fmtNum(Dx, 4)} = ${fmtNum(factorAnualidad, 8)}`;
+          edadesInvolucradas.push({ edad: x + m, rol: `Inicio de renta diferida anticipada (x + m = ${x + m})` });
+        } else {
+          const Nxm1 = getConmutado(x + m + 1, 'Nx');
+          factorAnualidad = Nxm1 / Dx;
+          formulaSimbolica = `_{${m}|}a_${x} = N_${x + m + 1} / D_${x}`;
+          sustitucionTexto = `${fmtNum(Nxm1, 4)} / ${fmtNum(Dx, 4)} = ${fmtNum(factorAnualidad, 8)}`;
+          edadesInvolucradas.push({ edad: x + m + 1, rol: `Inicio de renta diferida vencida (x + m + 1 = ${x + m + 1})` });
+        }
+      } else if (tipoAnu === 'diferida_temporal') {
+        if (esAnticipada) {
+          const Nxm = getConmutado(x + m, 'Nx');
+          const Nxmn = getConmutado(x + m + n, 'Nx');
+          factorAnualidad = (Nxm - Nxmn) / Dx;
+          formulaSimbolica = `_{${m}|${n}}ä_${x} = (N_${x + m} - N_${x + m + n}) / D_${x}`;
+          sustitucionTexto = `(${fmtNum(Nxm, 4)} - ${fmtNum(Nxmn, 4)}) / ${fmtNum(Dx, 4)} = ${fmtNum(factorAnualidad, 8)}`;
+          edadesInvolucradas.push({ edad: x + m, rol: `Inicio de renta diferida anticipada (x + m = ${x + m})` });
+          edadesInvolucradas.push({ edad: x + m + n, rol: `Fin de renta diferida anticipada (x + m + n = ${x + m + n})` });
+        } else {
+          const Nxm1 = getConmutado(x + m + 1, 'Nx');
+          const Nxmn1 = getConmutado(x + m + n + 1, 'Nx');
+          factorAnualidad = (Nxm1 - Nxmn1) / Dx;
+          formulaSimbolica = `_{${m}|${n}}a_${x} = (N_${x + m + 1} - N_${x + m + n + 1}) / D_${x}`;
+          sustitucionTexto = `(${fmtNum(Nxm1, 4)} - ${fmtNum(Nxmn1, 4)}) / ${fmtNum(Dx, 4)} = ${fmtNum(factorAnualidad, 8)}`;
+          edadesInvolucradas.push({ edad: x + m + 1, rol: `Inicio de renta diferida vencida (x + m + 1 = ${x + m + 1})` });
+          edadesInvolucradas.push({ edad: x + m + n + 1, rol: `Fin de renta diferida vencida (x + m + n + 1 = ${x + m + n + 1})` });
+        }
+      }
+
+      const costoTotalAnualidad = R * factorAnualidad;
+
+      const nombresAnu = {
+        temporal: `Anualidad Contingente Temporal (${n} años)`,
+        vitalicia: 'Anualidad Contingente Vitalicia',
+        diferida_temporal: `Anualidad Contingente Diferida Temporal (m = ${m}, n = ${n} años)`,
+        diferida_vitalicia: `Anualidad Contingente Diferida Vitalicia (m = ${m} años)`
+      };
+
+      const textoMomento = esAnticipada ? 'Anticipada (ä — inicio de cada año)' : 'Vencida (a — final de cada año)';
+
+      renderizarComprobante({
+        tituloCertificado: `${nombresAnu[tipoAnu]} — ${esAnticipada ? 'Anticipada' : 'Vencida'}`,
+        lblMontoBase: 'Renta Anual Contratada (R)',
+        valMontoBase: R,
+        subMontoBase: `Pago anual contingente (${esAnticipada ? 'anticipado' : 'vencido'})`,
+        lblFactor: 'Factor de Anualidad Unitario',
+        valFactor: factorAnualidad,
+        lblPrima: 'Prima Calculada (Costo / VPA)',
+        valPrima: costoTotalAnualidad,
+        subPrima: 'Valor Presente Actuarial de la Anualidad',
+        detallesProducto: [
+          { k: 'Categoría', v: 'Anualidad Contingente' },
+          { k: 'Tipo de Anualidad', v: nombresAnu[tipoAnu] },
+          { k: 'Momento de Pago', v: textoMomento },
+          ...(requiereM ? [{ k: 'Diferimiento (m)', v: `${m} años` }] : []),
+          ...(requiereN ? [{ k: 'Temporalidad (n)', v: `${n} años de renta` }] : []),
+          { k: 'Tasa de Interés Técnico', v: '5.00% anual (CNSF 2000-I)' }
+        ],
+        htmlPasoAPaso:
+          `<div><span class="hl-cyan">1. Ajuste de Edad Actuarial (x):</span></div>` +
+          `<div>   x = max(14, ${estadoApp.edadReal} - ${estadoApp.sexo === 'F' ? 2 : 0} - ${!estadoApp.fuma ? 2 : 0}) = <span class="hl-green">${x} años</span></div>` +
+          `<div style="margin-top:0.5rem;"><span class="hl-cyan">2. Valor Presente Actuarial por unidad de Renta:</span></div>` +
+          `<div>   Fórmula: ${formulaSimbolica}</div>` +
+          `<div>   Sustitución: ${sustitucionTexto}</div>` +
+          `<div style="margin-top:0.5rem;"><span class="hl-cyan">3. Prima Calculada / Valor Presente Actuarial Total (R × Factor):</span></div>` +
+          `<div>   Costo Total = ${fmtMoneda(R)} × ${fmtNum(factorAnualidad, 8)} = <span class="hl-green">${fmtMoneda(costoTotalAnualidad)}</span> (${fmtNum(costoTotalAnualidad, 4)} MXN)</div>`,
+        edadesInvolucradas
+      });
+    }
+
+    // 10. RENDERIZADO DEL COMPROBANTE (PASO 3)
+    function escaparHTML(texto) {
+      return String(texto).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    function renderizarComprobante(datos) {
+      const ahora = new Date();
+      const folioStr = `FOLIO: CNSF-${ahora.getFullYear()}-${String(estadoApp.contadorFolios++).padStart(4, '0')}`;
+      document.getElementById('certFolio').textContent = folioStr;
+      document.getElementById('certFecha').textContent = `Emisión: ${ahora.toLocaleString('es-MX')}`;
+      document.getElementById('certTituloProducto').textContent = datos.tituloCertificado;
+
+      document.getElementById('lblMontoBaseResultado').textContent = datos.lblMontoBase;
+      document.getElementById('valMontoBaseResultado').textContent = fmtMoneda(datos.valMontoBase);
+      document.getElementById('subMontoBaseResultado').textContent = datos.subMontoBase;
+
+      document.getElementById('lblFactorUnitario').textContent = datos.lblFactor;
+      document.getElementById('valFactorUnitario').textContent = fmtNum(datos.valFactor, 8);
+
+      document.getElementById('lblPrimaCalculada').textContent = datos.lblPrima;
+      document.getElementById('valPrimaCalculada').textContent = fmtMoneda(datos.valPrima);
+      document.getElementById('subPrimaCalculada').textContent =
+        `${datos.subPrima} • Exacto: $${fmtNum(datos.valPrima, 4)} MXN`;
+
+      // Datos del asegurado
+      const listaAsegurado = [
+        { k: 'Nombre del Asegurado', v: escaparHTML(estadoApp.nombre) },
+        { k: 'Edad Real Ingresada', v: `${estadoApp.edadReal} años` },
+        { k: 'Sexo', v: estadoApp.sexo === 'F' ? 'Femenino (-2 años)' : 'Masculino (0 años)' },
+        { k: 'Estatus de Fumador', v: !estadoApp.fuma ? 'No Fumador(a) (-2 años)' : 'Fumador(a) (0 años)' },
+        {
+          k: 'Edad Actuarial Aplicada (x)',
+          v: `x = ${estadoApp.edadActuarial} años` + (estadoApp.truncadaA14 ? ' (Truncada al mínimo de 14)' : ''),
+          mono: true
+        }
+      ];
+
+      document.getElementById('listaDatosAseguradoResultado').innerHTML = listaAsegurado
+        .map((item) => `<div class="kv-row"><span class="k">${item.k}</span><span class="v ${item.mono ? 'mono' : ''}">${item.v}</span></div>`)
+        .join('');
+
+      document.getElementById('listaDatosProductoResultado').innerHTML = datos.detallesProducto
+        .map((item) => `<div class="kv-row"><span class="k">${item.k}</span><span class="v">${item.v}</span></div>`)
+        .join('');
+
+      document.getElementById('desglosePasoAPaso').innerHTML = datos.htmlPasoAPaso;
+
+      // Tabla de conmutados de las edades involucradas (sin duplicar edades)
+      const mapaEdades = new Map();
+      datos.edadesInvolucradas.forEach((item) => {
+        if (!mapaEdades.has(item.edad)) {
+          mapaEdades.set(item.edad, item.rol);
+        } else {
+          mapaEdades.set(item.edad, mapaEdades.get(item.edad) + ' / ' + item.rol);
+        }
+      });
+
+      const filasHTML = [];
+      Array.from(mapaEdades.entries())
+        .sort((a, b) => a[0] - b[0])
+        .forEach(([edadK, rolTexto]) => {
+          const fila = TABLA_CONMUTADOS.valores[String(edadK)] || {
+            x: edadK, qx: 1, lx: 0, dx: 0, Dx: 0, Nx: 0, Cx: 0, Mx: 0
+          };
+          const notaPostOmega = edadK > OMEGA ? ' (Post-ω → 0)' : '';
+          filasHTML.push(`
+            <tr class="highlight-row">
+              <td>${edadK}</td>
+              <td style="text-align:left; font-family: var(--font-sans);">${rolTexto}${notaPostOmega}</td>
+              <td>${fmtNum(fila.qx, 6)}</td>
+              <td>${fmtNum(fila.lx, 2)}</td>
+              <td>${fmtNum(fila.dx, 2)}</td>
+              <td>${fmtNum(fila.Dx, 4)}</td>
+              <td>${fmtNum(fila.Nx, 4)}</td>
+              <td>${fmtNum(fila.Cx, 4)}</td>
+              <td>${fmtNum(fila.Mx, 4)}</td>
+            </tr>
+          `);
+        });
+
+      document.getElementById('tbodyConmutadosUsados').innerHTML = filasHTML.join('');
+      irAPaso(3);
+    }
+
+    // 11. MODAL DE TABLA COMPLETA CNSF 2000-I
+    const modalTablaCompleta = document.getElementById('modalTablaCompleta');
+    const tbodyTablaCompleta = document.getElementById('tbodyTablaCompleta');
+    const scrollTablaCompleta = document.getElementById('scrollTablaCompleta');
+    const btnAbrirTablaModal = document.getElementById('btnAbrirTablaModal');
+    const btnCerrarTablaModal = document.getElementById('btnCerrarTablaModal');
+    let tablaModalRenderizada = false;
+    let temporizadorCierreModal = null;
+
+    function edadActuarialVigente() {
+      // En el paso 1 se usa la edad de la vista previa en vivo; después, la ya validada.
+      if (pasoActual !== 1) return estadoApp.edadActuarial;
+      const sel = obtenerSeleccionesPaso1();
+      const edadBase = isNaN(sel.edadReal) ? 14 : Math.min(75, Math.max(14, Math.round(sel.edadReal)));
+      return calcularEdadActuarial(edadBase, sel.sexo, sel.fuma).x;
+    }
+
+    function abrirModalTabla() {
+      if (!tablaModalRenderizada) {
+        const htmlRows = [];
+        for (let edad = 12; edad <= 101; edad++) {
+          const f = TABLA_CONMUTADOS.valores[String(edad)];
+          if (!f) continue;
+          htmlRows.push(`
+            <tr data-edad="${edad}">
+              <td>${edad}${edad > OMEGA ? ' (Post-ω)' : ''}</td>
+              <td>${fmtNum(f.qx, 6)}</td>
+              <td>${fmtNum(f.px, 6)}</td>
+              <td>${fmtNum(f.lx, 2)}</td>
+              <td>${fmtNum(f.dx, 2)}</td>
+              <td>${fmtNum(f.Cx, 4)}</td>
+              <td>${fmtNum(f.Dx, 4)}</td>
+              <td>${fmtNum(f.Mx, 4)}</td>
+              <td>${fmtNum(f.Nx, 4)}</td>
+              <td>${fmtNum(f.Sx, 2)}</td>
+              <td>${fmtNum(f.Rx, 2)}</td>
+            </tr>
+          `);
+        }
+        tbodyTablaCompleta.innerHTML = htmlRows.join('');
+        tablaModalRenderizada = true;
+      }
+
+      clearTimeout(temporizadorCierreModal);
+      modalTablaCompleta.classList.remove('hidden');
+      document.body.classList.add('modal-open');
+
+      // Resaltar siempre la edad actuarial vigente (antes quedaba fija en la primera apertura)
+      const xVigente = edadActuarialVigente();
+      let filaResaltada = null;
+      tbodyTablaCompleta.querySelectorAll('tr').forEach((tr) => {
+        const esFila = Number(tr.dataset.edad) === xVigente;
+        tr.classList.toggle('highlight-row', esFila);
+        if (esFila) filaResaltada = tr;
+      });
+      if (filaResaltada) {
+        scrollTablaCompleta.scrollTop = Math.max(0, filaResaltada.offsetTop - scrollTablaCompleta.clientHeight / 2);
+      }
+
+      // Forzar un frame con el estado inicial para que la transición arranque desde ahí
+      void modalTablaCompleta.offsetWidth;
+      modalTablaCompleta.classList.add('is-open');
+      btnCerrarTablaModal.focus({ preventScroll: true });
+    }
+
+    function cerrarModalTabla() {
+      if (modalTablaCompleta.classList.contains('hidden')) return;
+      modalTablaCompleta.classList.remove('is-open');
+      document.body.classList.remove('modal-open');
+      clearTimeout(temporizadorCierreModal);
+      temporizadorCierreModal = setTimeout(() => {
+        modalTablaCompleta.classList.add('hidden');
+      }, prefiereMenosMovimiento.matches ? 200 : 360);
+      btnAbrirTablaModal.focus({ preventScroll: true });
+    }
+
+    btnAbrirTablaModal.addEventListener('click', abrirModalTabla);
+    btnCerrarTablaModal.addEventListener('click', cerrarModalTabla);
+
+    modalTablaCompleta.addEventListener('click', (e) => {
+      if (e.target === modalTablaCompleta) {
+        cerrarModalTabla();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') cerrarModalTabla();
+    });
+
+    // Inicializar vista previa del Paso 1 al cargar
+    actualizarPreviewEdadPaso1();
+  </script>
+
+  <!-- ===================================================================== -->
+  <!-- MEJORAS DE INTERACCIÓN (NO MODIFICA CÁLCULOS NI VALORES MOSTRADOS)    -->
+  <!-- ===================================================================== -->
+  <script>
+    (function () {
+      const menosMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const EASE_OUT = 'cubic-bezier(0.23, 1, 0.32, 1)';
+
+      // A. Barra superior: la línea divisoria aparece solo cuando hay contenido debajo
+      const barra = document.getElementById('barraSuperior');
+      const alDesplazar = () => barra.classList.toggle('is-scrolled', window.scrollY > 4);
+      window.addEventListener('scroll', alDesplazar, { passive: true });
+      alDesplazar();
+
+      // B. Botones − / + de la edad (disparan el mismo evento "input" que teclear)
+      document.querySelectorAll('.num-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const input = document.getElementById(btn.dataset.stepTarget);
+          if (!input) return;
+          const min = Number(input.min);
+          const max = Number(input.max);
+          const actual = Number(input.value);
+          const base = (input.value === '' || isNaN(actual)) ? min : Math.round(actual);
+          input.value = String(Math.min(max, Math.max(min, base + Number(btn.dataset.step))));
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+      });
+
+      // C. Eco con formato de moneda y estado activo de los montos rápidos
+      function refrescarMonto(input) {
+        const eco = document.querySelector(`[data-echo-for="${input.id}"]`);
+        const valor = Number(input.value);
+        const valido = input.value !== '' && isFinite(valor) && valor > 0;
+        if (eco) eco.innerHTML = valido ? `<strong>${fmtMoneda(valor)}</strong>` : '';
+        document.querySelectorAll(`.btn-chip[data-target="${input.id}"]`).forEach((chip) => {
+          const activo = valido && Number(chip.dataset.val) === valor;
+          chip.classList.toggle('is-active', activo);
+          chip.setAttribute('aria-pressed', activo ? 'true' : 'false');
+        });
+      }
+
+      const inputsMonto = ['sumaAsegurada', 'montoRenta'].map((id) => document.getElementById(id));
+      inputsMonto.forEach((input) => {
+        input.addEventListener('input', () => refrescarMonto(input));
+        refrescarMonto(input);
+      });
+      document.querySelectorAll('.btn-chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          const input = document.getElementById(chip.dataset.target);
+          if (input) refrescarMonto(input);
+        });
+      });
+      document.getElementById('formPaso2').addEventListener('reset', () => {
+        setTimeout(() => inputsMonto.forEach(refrescarMonto), 0);
+      });
+
+      // D. La edad actuarial "asienta" suavemente cada vez que cambia
+      const valorX = document.getElementById('valorEdadActuarialPreview');
+      let textoXPrevio = valorX.textContent;
+      new MutationObserver(() => {
+        if (valorX.textContent === textoXPrevio) return;
+        textoXPrevio = valorX.textContent;
+        if (menosMovimiento.matches || !valorX.animate) return;
+        valorX.animate(
+          [{ opacity: 0.35, transform: 'translateY(5px)' }, { opacity: 1, transform: 'translateY(0)' }],
+          { duration: 240, easing: EASE_OUT }
+        );
+      }).observe(valorX, { childList: true, characterData: true, subtree: true });
+
+      // E. Cambio de paso: foco en el título y conteo de la prima al llegar al comprobante
+      const titulos = { 1: 'tituloPaso1', 2: 'tituloPaso2', 3: 'certTituloProducto' };
+      const valPrima = document.getElementById('valPrimaCalculada');
+      let cuadroConteo = null;
+      let textoFinalPrima = null;
+      let respaldoConteo = null;
+
+      function terminarConteo() {
+        if (cuadroConteo !== null) cancelAnimationFrame(cuadroConteo);
+        cuadroConteo = null;
+        clearTimeout(respaldoConteo);
+        if (textoFinalPrima !== null) valPrima.textContent = textoFinalPrima; // siempre el texto exacto original
+        textoFinalPrima = null;
+      }
+
+      function contarPrima() {
+        terminarConteo();
+        const textoFinal = valPrima.textContent;
+        const destino = parseFloat(textoFinal.replace(/[^0-9.]/g, ''));
+        // Sin conteo si la pestaña no está visible: requestAnimationFrame se pausa y la cifra quedaría en $0.00
+        if (menosMovimiento.matches || document.hidden || !isFinite(destino) || destino <= 0) return;
+        textoFinalPrima = textoFinal;
+        const duracion = 700;
+        const inicio = performance.now() + 180; // espera a que la tarjeta haya entrado
+        valPrima.textContent = fmtMoneda(0);
+        const cuadro = (ahora) => {
+          const t = Math.min(1, Math.max(0, (ahora - inicio) / duracion));
+          const suavizado = 1 - Math.pow(1 - t, 4);
+          if (t < 1) {
+            valPrima.textContent = fmtMoneda(destino * suavizado);
+            cuadroConteo = requestAnimationFrame(cuadro);
+          } else {
+            terminarConteo();
+          }
+        };
+        cuadroConteo = requestAnimationFrame(cuadro);
+        // Respaldo: aunque el navegador no entregue cuadros, la cifra exacta queda puesta
+        respaldoConteo = setTimeout(terminarConteo, duracion + 500);
+      }
+
+      window.addEventListener('beforeprint', terminarConteo);
+      document.addEventListener('visibilitychange', () => { if (document.hidden) terminarConteo(); });
+
+      document.addEventListener('cotizador:paso', (e) => {
+        const { paso, anterior } = e.detail;
+        if (paso !== 3) terminarConteo();
+        const titulo = document.getElementById(titulos[paso]);
+        if (titulo && paso !== anterior) titulo.focus({ preventScroll: true });
+        if (paso === 3) contarPrima();
+      });
+
+      // F. Fondo de agua: mover el cursor empuja el agua; esta deriva despacio y vuelve a calmarse
+      (function () {
+        const capas = Array.from(document.querySelectorAll('#fondoLiquido i, #fondoLiquido span'));
+        if (!capas.length || menosMovimiento.matches) return;
+        // [cuánto se desplaza cada capa con la corriente, qué tan rápido la alcanza]
+        const config = [[0.55, 0.030], [0.85, 0.022], [1.15, 0.016], [0.70, 0.026], [1.50, 0.020], [-0.60, 0.012]];
+        const estado = config.map(() => ({ x: 0, y: 0 }));
+        const EMPUJE = 0.004;      // fracción del movimiento del cursor que pasa al agua
+        const VEL_MAX = 1.1;       // px por cuadro: el agua nunca corre
+        const FRICCION = 0.985;    // la corriente se apaga poco a poco
+        const RETORNO = 0.00012;   // fuerza suave que regresa el agua a su sitio
+        let px = 0, py = 0, vx = 0, vy = 0, ultimoX = null, ultimoY = null, cuadro = null;
+
+        function paso() {
+          vx = (vx - px * RETORNO) * FRICCION;
+          vy = (vy - py * RETORNO) * FRICCION;
+          px += vx; py += vy;
+          let enMovimiento = Math.abs(vx) > 0.004 || Math.abs(vy) > 0.004 || Math.abs(px) > 0.4 || Math.abs(py) > 0.4;
+          capas.forEach((capa, i) => {
+            const [factor, alcance] = config[i];
+            const s = estado[i];
+            const dx = px * factor - s.x, dy = py * factor - s.y;
+            s.x += dx * alcance; s.y += dy * alcance;
+            if (Math.abs(dx) > 0.3 || Math.abs(dy) > 0.3) enMovimiento = true;
+            capa.style.transform = `translate3d(${s.x.toFixed(2)}px, ${s.y.toFixed(2)}px, 0)`;
+          });
+          cuadro = enMovimiento ? requestAnimationFrame(paso) : null; // se detiene cuando el agua se calma
+        }
+
+        window.addEventListener('pointermove', (ev) => {
+          if (ultimoX !== null) {
+            vx = Math.max(-VEL_MAX, Math.min(VEL_MAX, vx + (ev.clientX - ultimoX) * EMPUJE));
+            vy = Math.max(-VEL_MAX, Math.min(VEL_MAX, vy + (ev.clientY - ultimoY) * EMPUJE));
+          }
+          ultimoX = ev.clientX; ultimoY = ev.clientY;
+          if (cuadro === null) cuadro = requestAnimationFrame(paso);
+        }, { passive: true });
+        document.documentElement.addEventListener('mouseleave', () => { ultimoX = ultimoY = null; });
+      })();
+
+      // G. Mientras las burbujas de la barra de pasos se dividen o se fusionan, su borde ondula y se asienta
+      (function () {
+        const desplazamiento = document.getElementById('desplazamientoLiquido');
+        let cuadro = null, respaldo = null;
+
+        function terminar() {
+          if (cuadro !== null) cancelAnimationFrame(cuadro);
+          cuadro = null;
+          clearTimeout(respaldo);
+          desplazamiento.setAttribute('scale', '0');
+        }
+
+        document.addEventListener('cotizador:paso', (e) => {
+          terminar();
+          if (menosMovimiento.matches || document.hidden || e.detail.paso === e.detail.anterior) return;
+          const duracion = 1400, inicio = performance.now();
+          const anim = (ahora) => {
+            const t = Math.min(1, Math.max(0, (ahora - inicio) / duracion));
+            // sube suave, alcanza su máximo pronto y se desvanece largo: sin golpe al empezar ni al terminar
+            const forma = Math.sin(Math.PI * Math.pow(t, 0.55));
+            desplazamiento.setAttribute('scale', (12 * forma).toFixed(2));
+            if (t < 1) cuadro = requestAnimationFrame(anim); else terminar();
+          };
+          cuadro = requestAnimationFrame(anim);
+          respaldo = setTimeout(terminar, duracion + 400);
+        });
+        document.addEventListener('visibilitychange', () => { if (document.hidden) terminar(); });
+        window.addEventListener('beforeprint', terminar);
+      })();
+
+      // H. Opciones líquidas: al cambiar de opción, primero los dos botones se funden en uno,
+      //    luego la luz azul cruza de un lado al otro, y al final vuelven a separarse
+      // Cada grupo recibe su propia copia de los filtros, con una etapa de ondulación,
+      // para que al cambiar una opción no vibren los demás grupos
+      const SVG_NS = 'http://www.w3.org/2000/svg';
+      function filtroConOndulacion(idBase, sufijo) {
+        const base = document.getElementById(idBase);
+        const copia = base.cloneNode(true);
+        copia.id = idBase + sufijo;
+        copia.querySelector('feMerge').setAttribute('result', 'unido');
+        const ruido = document.createElementNS(SVG_NS, 'feTurbulence');
+        ruido.setAttribute('type', 'fractalNoise');
+        ruido.setAttribute('baseFrequency', '0.018 0.045');
+        ruido.setAttribute('numOctaves', '2');
+        ruido.setAttribute('seed', '11');
+        ruido.setAttribute('result', 'ruido');
+        const onda = document.createElementNS(SVG_NS, 'feDisplacementMap');
+        onda.setAttribute('in', 'unido');
+        onda.setAttribute('in2', 'ruido');
+        onda.setAttribute('scale', '0');
+        onda.setAttribute('xChannelSelector', 'R');
+        onda.setAttribute('yChannelSelector', 'G');
+        copia.append(ruido, onda);
+        base.parentNode.appendChild(copia);
+        return onda;
+      }
+
+      document.querySelectorAll('.choice-grid-2').forEach((grupo, indiceGrupo) => {
+        const tarjetas = Array.from(grupo.querySelectorAll('.choice-card'));
+        if (tarjetas.length !== 2) return;
+        const capa = document.createElement('div');
+        capa.className = 'luz-seleccion no-print';
+        capa.setAttribute('aria-hidden', 'true');
+        capa.innerHTML = '<i></i><i></i><i></i>'; // una gota por tarjeta + el puente
+        const cuerpo = document.createElement('div');
+        cuerpo.className = 'cuerpo-opciones no-print';
+        cuerpo.setAttribute('aria-hidden', 'true');
+        cuerpo.innerHTML = '<i></i><i></i><i></i>'; // el cuerpo de cada botón + la unión entre ambos
+        grupo.prepend(capa);
+        grupo.prepend(cuerpo);
+        grupo.classList.add('con-luz');
+        const union = cuerpo.children[2];
+        // el cuerpo y la luz usan el mismo ruido, así sus bordes ondulan juntos
+        const ondas = [filtroConOndulacion('filtroCuerpo', indiceGrupo), filtroConOndulacion('filtroLuz', indiceGrupo)];
+        cuerpo.style.filter = `url(#filtroCuerpo${indiceGrupo})`;
+        capa.style.filter = `url(#filtroLuz${indiceGrupo}) drop-shadow(0 0 10px var(--accent-ring))`;
+        let cuadroOnda = null, respaldoOnda = null;
+
+        function calmar() {
+          if (cuadroOnda !== null) cancelAnimationFrame(cuadroOnda);
+          cuadroOnda = null;
+          clearTimeout(respaldoOnda);
+          ondas.forEach((o) => o.setAttribute('scale', '0'));
+        }
+
+        function ondular(duracion) {
+          calmar();
+          if (document.hidden) return;
+          const inicio = performance.now();
+          const paso = (ahora) => {
+            const t = Math.min(1, Math.max(0, (ahora - inicio) / duracion));
+            const valor = (7 * Math.sin(Math.PI * Math.pow(t, 0.6))).toFixed(2); // sube suave y se apaga
+            ondas.forEach((o) => o.setAttribute('scale', valor));
+            if (t < 1) cuadroOnda = requestAnimationFrame(paso); else calmar();
+          };
+          cuadroOnda = requestAnimationFrame(paso);
+          respaldoOnda = setTimeout(calmar, duracion + 400);
+        }
+        const gotas = [capa.children[0], capa.children[1]];
+        const puente = capa.children[2];
+        let horizontal = true;
+        let actual = tarjetas.findIndex((t) => t.classList.contains('selected'));
+
+        const eje = (v) => (horizontal ? `scaleX(${v})` : `scaleY(${v})`);
+        const ejePuente = (v) => (horizontal ? `scaleY(${v})` : `scaleX(${v})`);
+
+        function medir() {
+          const [a, b] = tarjetas;
+          if (!a.offsetWidth) return; // el grupo está oculto
+          horizontal = Math.abs(a.offsetTop - b.offsetTop) < 4;
+          tarjetas.forEach((t, i) => {
+            const caja = { left: t.offsetLeft + 'px', top: t.offsetTop + 'px', width: t.offsetWidth + 'px', height: t.offsetHeight + 'px' };
+            Object.assign(gotas[i].style, caja);
+            Object.assign(cuerpo.children[i].style, caja);
+          });
+          // cada gota crece y se encoge desde el lado que mira a la otra tarjeta
+          gotas[0].style.transformOrigin = horizontal ? 'right center' : 'center bottom';
+          gotas[1].style.transformOrigin = horizontal ? 'left center' : 'center top';
+          if (horizontal) {
+            const ini = a.offsetLeft + a.offsetWidth, hueco = b.offsetLeft - ini;
+            Object.assign(puente.style, { left: (ini - 8) + 'px', width: (hueco + 16) + 'px', top: (a.offsetTop + a.offsetHeight * 0.22) + 'px', height: (a.offsetHeight * 0.56) + 'px' });
+            Object.assign(union.style, { left: (ini - 10) + 'px', width: (hueco + 20) + 'px', top: (a.offsetTop + a.offsetHeight * 0.1) + 'px', height: (a.offsetHeight * 0.8) + 'px' });
+          } else {
+            const ini = a.offsetTop + a.offsetHeight, hueco = b.offsetTop - ini;
+            Object.assign(puente.style, { top: (ini - 8) + 'px', height: (hueco + 16) + 'px', left: (a.offsetLeft + a.offsetWidth * 0.3) + 'px', width: (a.offsetWidth * 0.4) + 'px' });
+            Object.assign(union.style, { top: (ini - 10) + 'px', height: (hueco + 20) + 'px', left: (a.offsetLeft + a.offsetWidth * 0.12) + 'px', width: (a.offsetWidth * 0.76) + 'px' });
+          }
+          asentar();
+        }
+
+        function asentar() {
+          calmar();
+          [gotas[0], gotas[1], puente, union].forEach((g) => g.getAnimations().forEach((an) => an.cancel()));
+          gotas.forEach((g, i) => { g.style.transform = eje(i === actual ? 1 : 0); });
+          puente.style.transform = ejePuente(0);
+          union.style.transform = ejePuente(0);
+        }
+
+        function sincronizar(animar) {
+          const nuevo = tarjetas.findIndex((t) => t.classList.contains('selected'));
+          if (nuevo === actual) return;
+          const anterior = actual;
+          actual = nuevo;
+          asentar();
+          if (!animar || anterior < 0 || nuevo < 0 || menosMovimiento.matches || !gotas[0].animate) return;
+          const duracion = 640, curva = 'cubic-bezier(0.65, 0, 0.35, 1)';
+          // 1) los botones se funden  2) la luz cruza  3) se separan; mientras tanto el borde ondula
+          ondular(duracion + 260);
+          union.animate([{ transform: ejePuente(0) }, { transform: ejePuente(1), offset: 0.26 }, { transform: ejePuente(1), offset: 0.74 }, { transform: ejePuente(0) }], { duration: duracion, easing: 'ease-in-out' });
+          gotas[anterior].animate([{ transform: eje(1) }, { transform: eje(1), offset: 0.22 }, { transform: eje(0), offset: 0.7 }, { transform: eje(0) }], { duration: duracion, easing: curva });
+          gotas[nuevo].animate([{ transform: eje(0) }, { transform: eje(0), offset: 0.3 }, { transform: eje(1), offset: 0.8 }, { transform: eje(1) }], { duration: duracion, easing: curva });
+          puente.animate([{ transform: ejePuente(0) }, { transform: ejePuente(0), offset: 0.16 }, { transform: ejePuente(1), offset: 0.34 }, { transform: ejePuente(1), offset: 0.62 }, { transform: ejePuente(0), offset: 0.8 }, { transform: ejePuente(0) }], { duration: duracion, easing: 'ease-in-out' });
+        }
+
+        grupo.addEventListener('change', () => sincronizar(true));
+        const formulario = grupo.closest('form');
+        if (formulario) formulario.addEventListener('reset', () => setTimeout(() => sincronizar(false), 0));
+        document.getElementById('btnNuevaCotizacion').addEventListener('click', () => setTimeout(() => sincronizar(false), 0));
+        if ('ResizeObserver' in window) new ResizeObserver(medir).observe(grupo);
+        medir();
+      });
+    })();
+  </script>
+
+</body>
+</html>
