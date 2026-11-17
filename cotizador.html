@@ -2668,6 +2668,15 @@ const TABLA_CONMUTADOS = {
       if (numPaso === 2) {
         prepararPaso2();
       }
+
+      // En iOS/Safari, quitar display:none no siempre reinicia la animación CSS; se fuerza reflow
+      const tarjetaActiva = [seccionPaso1, seccionPaso2, seccionPaso3][numPaso - 1];
+      if (tarjetaActiva && !prefiereMenosMovimiento.matches) {
+        tarjetaActiva.style.animation = 'none';
+        void tarjetaActiva.offsetWidth;
+        tarjetaActiva.style.animation = '';
+      }
+
       pasoActual = numPaso;
       window.scrollTo({ top: 0, behavior: prefiereMenosMovimiento.matches ? 'auto' : 'smooth' });
       document.dispatchEvent(new CustomEvent('cotizador:paso', { detail: { paso: numPaso, anterior: pasoAnterior } }));
@@ -3468,10 +3477,13 @@ const TABLA_CONMUTADOS = {
         scrollTablaCompleta.scrollTop = Math.max(0, filaResaltada.offsetTop - scrollTablaCompleta.clientHeight / 2);
       }
 
-      // Forzar un frame con el estado inicial para que la transición arranque desde ahí
-      void modalTablaCompleta.offsetWidth;
-      modalTablaCompleta.classList.add('is-open');
-      btnCerrarTablaModal.focus({ preventScroll: true });
+      // En Safari/iOS se requiere doble requestAnimationFrame tras quitar display:none para disparar la transición
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          modalTablaCompleta.classList.add('is-open');
+          btnCerrarTablaModal.focus({ preventScroll: true });
+        });
+      });
     }
 
     function cerrarModalTabla() {
@@ -3509,6 +3521,11 @@ const TABLA_CONMUTADOS = {
     (function () {
       const menosMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)');
       const EASE_OUT = 'cubic-bezier(0.23, 1, 0.32, 1)';
+      // En iPhone/iPad todos los navegadores (Safari, Chrome, etc.) usan WebKit,
+      // cuyo compositor GPU no repinta bien filtros SVG complejos (feDisplacementMap/feMorphology) sobre HTML animado.
+      const esIOSoSafari = /iP(ad|hone|od)/.test(navigator.userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ||
+        (/^((?!chrome|android|crios|fxios|edgios).)*safari/i.test(navigator.userAgent));
 
       // A. Barra superior: la línea divisoria aparece solo cuando hay contenido debajo
       const barra = document.getElementById('barraSuperior');
@@ -3659,12 +3676,30 @@ const TABLA_CONMUTADOS = {
           ultimoX = ev.clientX; ultimoY = ev.clientY;
           if (cuadro === null) cuadro = requestAnimationFrame(paso);
         }, { passive: true });
+        window.addEventListener('touchmove', (ev) => {
+          const t = ev.touches && ev.touches[0];
+          if (!t) return;
+          if (ultimoX !== null) {
+            vx = Math.max(-VEL_MAX, Math.min(VEL_MAX, vx + (t.clientX - ultimoX) * EMPUJE));
+            vy = Math.max(-VEL_MAX, Math.min(VEL_MAX, vy + (t.clientY - ultimoY) * EMPUJE));
+          }
+          ultimoX = t.clientX; ultimoY = t.clientY;
+          if (cuadro === null) cuadro = requestAnimationFrame(paso);
+        }, { passive: true });
+        window.addEventListener('touchend', () => { ultimoX = ultimoY = null; }, { passive: true });
         document.documentElement.addEventListener('mouseleave', () => { ultimoX = ultimoY = null; });
       })();
 
       // G. Mientras las burbujas de la barra de pasos se dividen o se fusionan, su borde ondula y se asienta
       (function () {
         const desplazamiento = document.getElementById('desplazamientoLiquido');
+        const contBurbujas = document.querySelector('.burbujas');
+        if (esIOSoSafari && contBurbujas) {
+          // En iOS WebKit, el filtro SVG sobre capas en transición puede congelar el repintado;
+          // se conserva la transición suave de división/fusión con sombra nativa.
+          contBurbujas.style.filter = 'drop-shadow(0 8px 18px var(--burbuja-sombra))';
+          return;
+        }
         let cuadro = null, respaldo = null;
 
         function terminar() {
@@ -3722,6 +3757,35 @@ const TABLA_CONMUTADOS = {
       document.querySelectorAll('.choice-grid-2').forEach((grupo, indiceGrupo) => {
         const tarjetas = Array.from(grupo.querySelectorAll('.choice-card'));
         if (tarjetas.length !== 2) return;
+
+        // En iOS/Safari, los filtros SVG complejos (feMorphology + feDisplacementMap) sobre tarjetas animadas
+        // no se repintan bien; usamos un indicador deslizante nativo por GPU que sí corre fluido en iPhone.
+        if (esIOSoSafari) {
+          const indicador = document.createElement('div');
+          indicador.setAttribute('aria-hidden', 'true');
+          indicador.style.cssText = 'position:absolute;z-index:2;pointer-events:none;border-radius:14px;border:2px solid var(--accent);background:var(--accent-tint);box-shadow:0 0 12px var(--accent-ring);transition:transform 420ms cubic-bezier(0.32,0.72,0,1),width 420ms cubic-bezier(0.32,0.72,0,1),height 420ms cubic-bezier(0.32,0.72,0,1);will-change:transform;';
+          grupo.prepend(indicador);
+          const posicionarIndicador = (animar) => {
+            const sel = tarjetas.find((t) => t.classList.contains('selected'));
+            if (!sel || !sel.offsetWidth) return;
+            if (!animar) indicador.style.transition = 'none';
+            indicador.style.width = sel.offsetWidth + 'px';
+            indicador.style.height = sel.offsetHeight + 'px';
+            indicador.style.transform = `translate3d(${sel.offsetLeft}px, ${sel.offsetTop}px, 0)`;
+            if (!animar) {
+              void indicador.offsetWidth;
+              indicador.style.transition = 'transform 420ms cubic-bezier(0.32,0.72,0,1),width 420ms cubic-bezier(0.32,0.72,0,1),height 420ms cubic-bezier(0.32,0.72,0,1)';
+            }
+          };
+          grupo.addEventListener('change', () => posicionarIndicador(true));
+          const form = grupo.closest('form');
+          if (form) form.addEventListener('reset', () => setTimeout(() => posicionarIndicador(false), 0));
+          document.getElementById('btnNuevaCotizacion').addEventListener('click', () => setTimeout(() => posicionarIndicador(false), 0));
+          if ('ResizeObserver' in window) new ResizeObserver(() => posicionarIndicador(false)).observe(grupo);
+          posicionarIndicador(false);
+          return;
+        }
+
         const capa = document.createElement('div');
         capa.className = 'luz-seleccion no-print';
         capa.setAttribute('aria-hidden', 'true');
